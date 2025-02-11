@@ -5,6 +5,17 @@ button.id = 'text-display-button';
 button.style.display = 'none';
 document.body.appendChild(button);
 
+// クリックされた要素がボタンまたはポップアップでない場合に、ボタンとポップアップを非表示にする
+document.addEventListener('mousedown', function(e) {
+    if (e.target !== button) {
+        button.style.display = 'none';
+    }
+    const popup = document.querySelector('.text-display-popup');
+    if (popup && e.target !== popup) {
+        popup.remove();
+    }
+});
+
 // テキスト選択時の処理
 document.addEventListener('mouseup', function(e) {
     const selectedText = window.getSelection().toString().trim();
@@ -18,8 +29,6 @@ document.addEventListener('mouseup', function(e) {
         button.style.position = 'absolute';
         button.style.left = `${rect.left + window.scrollX}px`;
         button.style.top = `${rect.bottom + window.scrollY}px`;
-    } else {
-        button.style.display = 'none';
     }
 });
 
@@ -39,4 +48,4 @@ button.addEventListener('click', function() {
         
         document.body.appendChild(popup);
     }
-}); 
+});
