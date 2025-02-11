@@ -7,7 +7,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["dictionary-api.js", "content.js"],
+      "js": ["gemini-api.js", "content.js"],
       "css": ["styles.css"]
     }
   ]
