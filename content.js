@@ -1,18 +1,18 @@
 // テキスト選択時のポップアップボタンを作成
 const button = document.createElement('button');
-button.textContent = '表示';
+button.textContent = '辞書検索';
 button.id = 'text-display-button';
 button.style.display = 'none';
 document.body.appendChild(button);
 
 // クリックされた要素がボタンまたはポップアップでない場合に、ボタンとポップアップを非表示にする
 document.addEventListener('mousedown', function(e) {
-    if (e.target !== button) {
+    if (e.target !== button && !e.target.closest('.text-display-popup')) {
         button.style.display = 'none';
-    }
-    const popup = document.querySelector('.text-display-popup');
-    if (popup && e.target !== popup) {
-        popup.remove();
+        const popup = document.querySelector('.text-display-popup');
+        if (popup) {
+            popup.remove();
+        }
     }
 });
 
@@ -33,19 +33,29 @@ document.addEventListener('mouseup', function(e) {
 });
 
 // ボタンクリック時の処理
-button.addEventListener('click', function() {
+button.addEventListener('click', async function() {
     const selectedText = window.getSelection().toString().trim();
     if (selectedText) {
+        // ローディング表示を作成
         const popup = document.createElement('div');
         popup.className = 'text-display-popup';
-        popup.textContent = selectedText;
+        popup.innerHTML = '<p class="loading">検索中...</p>';
         
         // ポップアップの位置をボタンの直下に固定
         const buttonRect = button.getBoundingClientRect();
         popup.style.position = 'absolute';
         popup.style.left = `${buttonRect.left + window.scrollX}px`;
-        popup.style.top = `${buttonRect.bottom + window.scrollY + 5}px`; // ボタンの下に5pxの余白を追加
+        popup.style.top = `${buttonRect.bottom + window.scrollY + 5}px`;
         
         document.body.appendChild(popup);
+        
+        // API呼び出し
+        const result = await fetchDictionaryData(selectedText);
+        
+        if (result.error) {
+            popup.innerHTML = `<p class="error">${result.message}</p>`;
+        } else {
+            popup.innerHTML = result.content;
+        }
     }
 });

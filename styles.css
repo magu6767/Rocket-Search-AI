@@ -14,12 +14,60 @@
 }
 
 .text-display-popup {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border-radius: 4px;
-    max-width: 300px;
+    background-color: white;
+    color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    min-width: 250px;
+    max-width: 400px;
     word-wrap: break-word;
     z-index: 10000;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.text-display-popup h3 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.text-display-popup .phonetic {
+    color: #7f8c8d;
+    margin: 0 0 12px 0;
+    font-style: italic;
+}
+
+.text-display-popup .part-of-speech {
+    color: #2980b9;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.text-display-popup .definition {
+    margin: 8px 0;
+    padding-left: 12px;
+}
+
+.text-display-popup .example {
+    color: #666;
+    font-style: italic;
+    margin: 4px 0 4px 12px;
+}
+
+.text-display-popup .synonyms {
+    color: #27ae60;
+    margin: 8px 0;
+    font-size: 13px;
+}
+
+.text-display-popup .loading {
+    text-align: center;
+    color: #666;
+}
+
+.text-display-popup .error {
+    color: #e74c3c;
+    text-align: center;
 } 
