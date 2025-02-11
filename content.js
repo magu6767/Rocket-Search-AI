@@ -1,6 +1,6 @@
 // テキスト選択時のポップアップボタンを作成
 const button = document.createElement('button');
-button.textContent = '辞書検索';
+button.textContent = 'AIに聞く';
 button.id = 'text-display-button';
 button.style.display = 'none';
 document.body.appendChild(button);

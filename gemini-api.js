@@ -45,7 +45,7 @@ function formatGeminiResponse(data) {
     const formattedContent = `
         <div class="gemini-response">
             <h3>分析結果</h3>
-            <p>${response.replace(/\n/g, '<br>')}</p>
+            <div class="markdown-content">${marked.parse(response)}</div>
         </div>
     `;
 
