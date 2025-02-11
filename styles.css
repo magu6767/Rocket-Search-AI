@@ -1,0 +1,25 @@
+#text-display-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10000;
+}
+
+#text-display-button:hover {
+    background-color: #45a049;
+}
+
+.text-display-popup {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    max-width: 300px;
+    word-wrap: break-word;
+    z-index: 10000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+} 

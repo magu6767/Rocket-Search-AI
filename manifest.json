@@ -1,0 +1,14 @@
+ {
+  "manifest_version": 3,
+  "name": "Text Display Extension",
+  "version": "1.0",
+  "description": "選択したテキストを表示する拡張機能",
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
