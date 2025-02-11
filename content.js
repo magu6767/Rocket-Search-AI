@@ -10,10 +10,14 @@ document.addEventListener('mouseup', function(e) {
     const selectedText = window.getSelection().toString().trim();
     
     if (selectedText) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
         button.style.display = 'block';
-        button.style.position = 'fixed';
-        button.style.left = `${e.pageX}px`;
-        button.style.top = `${e.pageY}px`;
+        button.style.position = 'absolute';
+        button.style.left = `${rect.left + window.scrollX}px`;
+        button.style.top = `${rect.bottom + window.scrollY}px`;
     } else {
         button.style.display = 'none';
     }
@@ -27,18 +31,12 @@ button.addEventListener('click', function() {
         popup.className = 'text-display-popup';
         popup.textContent = selectedText;
         
-        // ポップアップを表示位置の調整
-        popup.style.position = 'fixed';
-        popup.style.left = `${button.offsetLeft}px`;
-        popup.style.top = `${button.offsetTop + 30}px`;
+        // ポップアップの位置をボタンの直下に固定
+        const buttonRect = button.getBoundingClientRect();
+        popup.style.position = 'absolute';
+        popup.style.left = `${buttonRect.left + window.scrollX}px`;
+        popup.style.top = `${buttonRect.bottom + window.scrollY + 5}px`; // ボタンの下に5pxの余白を追加
         
         document.body.appendChild(popup);
-        
-        // 3秒後にポップアップを消す
-        setTimeout(() => {
-            popup.remove();
-        }, 3000);
-        
-        button.style.display = 'none';
     }
 }); 
