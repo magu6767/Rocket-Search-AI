@@ -1,24 +1,15 @@
-// Gemini APIを呼び出す関数
+// Cloudflare Workersを通じてGemini APIを呼び出す関数
 async function fetchDictionaryData(text) {
-    const API_KEY = 'YOUR_API_KEY'; // ここは後でユーザーが設定
-    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+    const WORKER_URL = 'http://localhost:8787'; // 開発時のエンドポイント
+    // const WORKER_URL = 'https://your-worker.your-subdomain.workers.dev'; // 本番用エンドポイント
     
     try {
-        const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+        const response = await fetch(WORKER_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `以下の選択されたテキストを分析して日本語で出力してください。
-                        「分析」とは、短い単語なら単純にその意味を調べて詳しく丁寧に解説し、長めの文章ならその内容をわかりやすく解説することです。
-                        分脈がわかるように、ページタイトル、見出し、前後の文脈を載せます。あくまで選択したテキストを分析して欲しいので、これらの情報は出力に含めないでください。
-${text}`
-                    }]
-                }]
-            })
+            body: JSON.stringify({ text })
         });
 
         if (!response.ok) {
@@ -30,7 +21,7 @@ ${text}`
     } catch (error) {
         return {
             error: true,
-            message: error.message || 'Gemini APIの呼び出し中にエラーが発生しました'
+            message: error.message || 'APIの呼び出し中にエラーが発生しました'
         };
     }
 }
