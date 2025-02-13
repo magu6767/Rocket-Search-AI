@@ -5,6 +5,53 @@ button.id = 'text-display-button';
 button.style.display = 'none';
 document.body.appendChild(button);
 
+// バックグラウンドスクリプトを通じてGemini APIを呼び出す関数
+async function fetchDictionaryData(text) {
+    try {
+        // テキストの長さをチェック
+        if (text.length > 10000) {
+            return {
+                error: true,
+                message: '選択されたテキストが長すぎます'
+            };
+        }
+
+        const response = await chrome.runtime.sendMessage({
+            action: 'fetchDictionary',
+            text: text
+        });
+
+        if (response.error) {
+            throw new Error(response.message);
+        }
+
+        if (!response || !response.candidates || !response.candidates[0] || !response.candidates[0].content) {
+            return {
+                error: true,
+                message: 'データの形式が不正です'
+            };
+        }
+
+        const responseText = response.candidates[0].content.parts[0].text;
+        const formattedContent = `
+            <div class="gemini-response">
+                <h3>分析結果</h3>
+                <div class="markdown-content">${marked.parse(responseText)}</div>
+            </div>
+        `;
+
+        return {
+            error: false,
+            content: formattedContent
+        };
+    } catch (error) {
+        return {
+            error: true,
+            message: error.message || 'APIの呼び出し中にエラーが発生しました'
+        };
+    }
+}
+
 // 選択されたテキストの前後の文脈を取得する関数
 function getContextualText(selection) {
     const range = selection.getRangeAt(0);
@@ -80,6 +127,7 @@ document.addEventListener('mouseup', function(e) {
 
 // ボタンクリック時の処理
 button.addEventListener('click', async function() {
+    const startTime = performance.now();
     const selection = window.getSelection();
     if (selection.toString().trim()) {
         // ローディング表示を作成
@@ -115,5 +163,8 @@ ${contextData.after}
         } else {
             popup.innerHTML = result.content;
         }
+
+        const endTime = performance.now();
+        console.log(`処理時間: ${endTime - startTime}ミリ秒`);
     }
 });
