@@ -16,6 +16,9 @@ const manifest = defineManifest({
       js: ['src/content.ts'],
     },
   ],
+  background: {
+    service_worker: 'src/background.ts',
+  },
 });
 
 // https://vite.dev/config/
