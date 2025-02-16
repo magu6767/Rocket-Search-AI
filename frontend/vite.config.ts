@@ -25,6 +25,7 @@ const manifest = defineManifest({
   },
   permissions: [
     'identity',
+    'storage',
   ],
   content_security_policy: {
     extension_pages: "script-src 'self'; object-src 'self'",

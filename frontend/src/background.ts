@@ -44,8 +44,27 @@ const signIn = async (sendResponse:any) => {
   const credential = GoogleAuthProvider.credential(null, token);
 
   const userCredential = await signInWithCredential(auth, credential);
+  const idToken = await userCredential.user.getIdToken();
+  await chrome.storage.local.set({ idToken });
 
-  console.log(userCredential);
+  try {
+    const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
+      headers: {
+        'Authorization': `Bearer ${idToken}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`APIリクエストに失敗しました: ${response.status} ${response.text()}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('認証エラーが発生しました:', error instanceof Error ? error.message : '不明なエラー');
+    throw error; // 上位のエラーハンドリングに委ねる
+  }
+
   sendResponse({ success: true });
 };
 

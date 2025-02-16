@@ -1,0 +1,14 @@
+name = "request-ai"
+main = "src/verify.ts"
+compatibility_date = "2025-02-04"
+
+[observability]
+enabled = true
+
+[vars]
+FIREBASE_PROJECT_ID = "web-extention"
+CLOUDFLARE_PUBLIC_JWK_CACHE_KEY = "firebase_public_key"
+
+[[kv_namespaces]]
+binding = "CLOUDFLARE_PUBLIC_JWK_CACHE_KV"
+id = "1ee4a5dd5cd84d5c8407fc4273214ddf"
