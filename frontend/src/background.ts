@@ -15,11 +15,30 @@ initializeApp(firebaseConfig);
 console.log('background.ts');
 
 const signIn = async (sendResponse:any) => {
-  const token = await new Promise<string>((resolve) => {
-    chrome.identity.getAuthToken({ 'interactive': true }, (token) => {
-      if (token) resolve(token);
-    });
-  });
+  // あとで構造を理解する
+  const manifest = chrome.runtime.getManifest();
+  const oauth2Manifest = manifest.oauth2;
+  if (!oauth2Manifest) {
+    throw new Error('OAuth2 configuration not found in manifest');
+  }
+  const clientId = oauth2Manifest.client_id;
+  const scopes = oauth2Manifest.scopes;
+  if (!scopes) {
+    throw new Error('Scopes not found in OAuth2 configuration');
+  }
+
+  const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(chrome.identity.getRedirectURL())}&response_type=token&scope=${encodeURIComponent(scopes.join(' '))}`;
+
+  const responseUrl = await chrome.identity.launchWebAuthFlow({interactive: true, url: authUrl});
+  if (!responseUrl) {
+    throw new Error('Failed to get response URL from auth flow');
+  }
+
+  const searchParams = new URL(responseUrl.replace(/#/, '?')).searchParams;
+  const token = searchParams.get('access_token');
+  if (!token) {
+    throw new Error('Failed to get access token from auth response');
+  }
 
   const auth = getAuth();
   const credential = GoogleAuthProvider.credential(null, token);
