@@ -49,20 +49,27 @@ const signIn = async (sendResponse:any) => {
 
   try {
     const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
+      method: 'POST',
       headers: {
-        'Authorization': `Bearer ${idToken}`
-      }
+        'Authorization': `Bearer ${idToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: "日本の木漏れ日は気持ちいい"
+      })
     });
 
     if (!response.ok) {
-      throw new Error(`APIリクエストに失敗しました: ${response.status} ${response.text()}`);
+      const errorText = await response.text();
+      throw new Error(`APIリクエストに失敗しました: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
-    console.log(data);
+    console.log('Gemini APIの応答:', data.result);
+    return data.result;
   } catch (error) {
-    console.error('認証エラーが発生しました:', error instanceof Error ? error.message : '不明なエラー');
-    throw error; // 上位のエラーハンドリングに委ねる
+    console.error('エラーが発生しました:', error instanceof Error ? error.message : '不明なエラー');
+    throw error;
   }
 
   sendResponse({ success: true });

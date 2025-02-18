@@ -1,5 +1,5 @@
 name = "request-ai"
-main = "src/verify.ts"
+main = "src/index.ts"
 compatibility_date = "2025-02-04"
 
 [observability]
@@ -12,3 +12,7 @@ CLOUDFLARE_PUBLIC_JWK_CACHE_KEY = "firebase_public_key"
 [[kv_namespaces]]
 binding = "CLOUDFLARE_PUBLIC_JWK_CACHE_KV"
 id = "1ee4a5dd5cd84d5c8407fc4273214ddf"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "a4891659d2924553a4ef7a966c66d92c"

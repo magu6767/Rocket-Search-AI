@@ -11,33 +11,108 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import type { FirebaseIdToken } from "firebase-auth-cloudflare-workers";
+import { Auth, WorkersKVStoreSingle } from "firebase-auth-cloudflare-workers";
+
+interface GeminiResponse {
+	candidates: Array<{
+		content: {
+			parts: Array<{
+				text: string;
+			}>;
+		};
+	}>;
+}
+
 interface Env {
 	GEMINI_API_KEY: string;
+	FIREBASE_PROJECT_ID: string;
+	CLOUDFLARE_PUBLIC_JWK_CACHE_KEY: string;
+	CLOUDFLARE_PUBLIC_JWK_CACHE_KV: KVNamespace;
+	RATE_LIMIT_KV: KVNamespace;
 }
 
 interface RequestData {
 	text: string;
 }
 
+const DAILY_LIMIT = 3; // 1日あたりのリクエスト制限
+const TIME_WINDOW = 86400; // 24時間（秒）
+
+const verifyJWT = async (req: Request, env: Env): Promise<FirebaseIdToken> => {
+	const authorization = req.headers.get('Authorization')
+	if (authorization === null) {
+		throw new Error("Authorization header is missing")
+	}
+	const jwt = authorization.replace(/Bearer\s+/i, "")
+
+	try {
+		const kvStore = WorkersKVStoreSingle.getOrInitialize(
+			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KEY,
+			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KV
+		);
+
+		const auth = Auth.getOrInitialize(env.FIREBASE_PROJECT_ID, kvStore);
+		const token = await auth.verifyIdToken(jwt, false);
+		return token;
+	} catch (error: any) {
+		console.error('Detailed error:', {
+			message: error.message,
+			stack: error.stack,
+			name: error.name
+		});
+		throw error;
+	}
+}
+
+async function checkRateLimit(uid: string, env: Env): Promise<boolean> {
+	const kvKey = `${uid}`;
+	const currentValue = await env.RATE_LIMIT_KV.get(kvKey);
+	const requestCount = currentValue ? parseInt(currentValue) : 0;
+
+	if (requestCount >= DAILY_LIMIT) {
+		return false;
+	}
+
+	await env.RATE_LIMIT_KV.put(kvKey, (requestCount + 1).toString(), {
+		expirationTtl: TIME_WINDOW,
+	});
+
+	return true;
+}
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		// CORSヘッダーを設定
 		if (request.method === 'OPTIONS') {
 			return new Response(null, {
 				headers: {
 					'Access-Control-Allow-Origin': '*',
 					'Access-Control-Allow-Methods': 'POST',
-					'Access-Control-Allow-Headers': 'Content-Type',
+					'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 				},
 			});
 		}
 
-		// POSTリクエストのみを受け付ける
 		if (request.method !== 'POST') {
 			return new Response('Method not allowed', { status: 405 });
 		}
 
 		try {
+			// JWTの検証
+			const token = await verifyJWT(request, env);
+			
+			// レートリミットのチェック
+			const isWithinLimit = await checkRateLimit(token.uid, env);
+			if (!isWithinLimit) {
+				return new Response('リクエスト制限を超えました。', {
+					status: 429,
+					headers: {
+						'Content-Type': 'application/json',
+						'Access-Control-Allow-Origin': '*',
+					},
+				});
+			}
+
 			const requestData = await request.json() as RequestData;
 			const text = requestData.text;
 
@@ -68,9 +143,10 @@ ${text}`
 				throw new Error('Failed to fetch from Gemini API');
 			}
 
-			const data = await response.json();
+			const data = await response.json() as GeminiResponse;
+			const result = data.candidates[0].content.parts[0].text;
 
-			return new Response(JSON.stringify(data), {
+			return new Response(JSON.stringify({ result }), {
 				headers: {
 					'Content-Type': 'application/json',
 					'Access-Control-Allow-Origin': '*',
@@ -78,8 +154,9 @@ ${text}`
 			});
 
 		} catch (error) {
+			const status = error instanceof Error && error.message.includes('Authorization') ? 401 : 500;
 			return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
-				status: 500,
+				status,
 				headers: {
 					'Content-Type': 'application/json',
 					'Access-Control-Allow-Origin': '*',
