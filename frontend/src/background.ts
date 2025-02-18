@@ -75,9 +75,52 @@ const signIn = async (sendResponse:any) => {
   sendResponse({ success: true });
 };
 
+const fetchDictionary = async (text: string, idToken: string) => {
+  try {
+    const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${idToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`APIリクエストに失敗しました: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('エラーが発生しました:', error instanceof Error ? error.message : '不明なエラー');
+    throw error;
+  }
+};
+
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === 'signIn') {
     signIn(sendResponse);
+    return true;
+  }
+  
+  if (request.action === 'fetchDictionary') {
+    (async () => {
+      try {
+        const { idToken } = await chrome.storage.local.get('idToken');
+        if (!idToken) {
+          throw new Error('認証が必要です');
+        }
+        const result = await fetchDictionary(request.text, idToken);
+        sendResponse(result);
+      } catch (error) {
+        sendResponse({
+          error: true,
+          message: error instanceof Error ? error.message : '不明なエラー'
+        });
+      }
+    })();
     return true;
   }
 });
