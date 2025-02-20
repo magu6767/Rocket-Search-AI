@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { TextSelector } from './components/TextSelector';
+import { TextSelector } from './TextSelector';
 import './content.css';
 
 // Shadow DOMのルート要素を作成

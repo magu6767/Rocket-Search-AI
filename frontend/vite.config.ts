@@ -12,16 +12,16 @@ const manifest = defineManifest({
   version: '1.0.0',
   description: 'Zenn投稿するChrome拡張機能のサンプルです。',
   action: {
-    default_popup: 'popup.html',
+    default_popup: 'src/popup/popup.html',
   },
   content_scripts: [
     {
       matches: ['<all_urls>'],
-      js: ['src/content.tsx'],
+      js: ['src/content/index.tsx'],
     },
   ],
   background: {
-    service_worker: 'src/background.ts',
+    service_worker: 'src/background/index.ts',
   },
   permissions: [
     'identity',
