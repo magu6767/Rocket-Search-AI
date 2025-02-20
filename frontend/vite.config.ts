@@ -17,7 +17,7 @@ const manifest = defineManifest({
   content_scripts: [
     {
       matches: ['<all_urls>'],
-      js: ['src/content.ts'],
+      js: ['src/content.tsx'],
     },
   ],
   background: {
