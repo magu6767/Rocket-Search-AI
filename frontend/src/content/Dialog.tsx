@@ -1,12 +1,16 @@
 interface DialogProps {
     selectedText: string;
+    contextData: {
+        pageTitle: string;
+        heading: string | null;
+        before: string;
+        after: string;
+    };
 }
 
-export const Dialog: React.FC<DialogProps> = ({selectedText}) => {
-
+export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
     return (
-        <div
-        >
+        <div>
             <div
                 style={{
                     backgroundColor: 'white',
@@ -35,10 +39,18 @@ export const Dialog: React.FC<DialogProps> = ({selectedText}) => {
                     ×
                 </button>
                 <h2 style={{ marginTop: 0, marginBottom: '15px' }}>選択されたテキスト</h2>
-                <div style={{ marginBottom: '15px' }}>{selectedText}</div>
+                <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                    <div style={{ fontSize: '0.9em', color: '#666', marginBottom: '5px' }}>
+                        ページ: {contextData.pageTitle}
+                        {contextData.heading && <span> | 見出し: {contextData.heading}</span>}
+                    </div>
+                    <div style={{ color: '#666' }}>{contextData.before}</div>
+                    <div style={{ margin: '10px 0', fontWeight: 'bold' }}>{selectedText}</div>
+                    <div style={{ color: '#666' }}>{contextData.after}</div>
+                </div>
                 <button
                     onClick={() => {
-                        console.log('選択されたテキスト:', selectedText);
+                        console.log('コンテキストデータ:', { selectedText, ...contextData });
                     }}
                     style={{
                         backgroundColor: '#4285f4',
