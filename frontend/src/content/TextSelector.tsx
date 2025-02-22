@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ActionIcon, Box, Popover } from '@mantine/core';
 import { useClickOutside } from '@mantine/hooks';
 import Dialog from './Dialog';
@@ -11,7 +11,7 @@ interface ContextData {
 }
 
 export default function TextSelector() {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isShowDialog, setIsShowDialog] = useState(false);
     const [isShowButton, setIsShowButton] = useState(false);
     const [button, setButton] = useState<HTMLDivElement | null>(null);
     const [selectedText, setSelectedText] = useState('');
@@ -22,6 +22,27 @@ export default function TextSelector() {
         before: '',
         after: ''
     });
+
+    useClickOutside(() => {
+        setIsShowButton(false);
+        setIsShowDialog(false);
+    }, null, [button]);
+
+    const handleTextSelection = () => {
+        const selection = window.getSelection();
+        if (selection && selection.toString().trim() !== '') {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const text = selection.toString().trim();
+            setSelectedText(text);
+            setButtonPosition({
+                x: rect.left,
+                y: rect.bottom + window.scrollY
+            });
+            setContextData(getContextualText(selection));
+            setIsShowButton(true);
+        }
+    };
 
     const getContextualText = (selection: Selection): ContextData => {
         const range = selection.getRangeAt(0);
@@ -67,31 +88,7 @@ export default function TextSelector() {
         };
     };
 
-    useEffect(() => {
-        const handleTextSelection = () => {
-            const selection = window.getSelection();
-            if (selection && selection.toString().trim() !== '') {
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                const text = selection.toString().trim();
-                setSelectedText(text);
-                setButtonPosition({
-                    x: rect.left,
-                    y: rect.bottom + window.scrollY
-                });
-                setContextData(getContextualText(selection));
-                setIsShowButton(true);
-            }
-        };
-
-        document.addEventListener('mouseup', handleTextSelection);
-        return () => document.removeEventListener('mouseup', handleTextSelection);
-    }, []);
-
-    useClickOutside(() => {
-        setIsShowButton(false);
-        setIsDialogOpen(false);
-    }, null, [button]);
+    document.addEventListener('mouseup', handleTextSelection);
 
     return (
         <>
@@ -106,7 +103,7 @@ export default function TextSelector() {
                     ref={setButton}
                 >
                     <Popover
-                        opened={isDialogOpen}
+                        opened={isShowDialog}
                         position="bottom"
                         withArrow
                         shadow="md"
@@ -117,7 +114,7 @@ export default function TextSelector() {
                                 color="blue"
                                 radius="xl"
                                 size="md"
-                                onClick={() => setIsDialogOpen(true)}
+                                onClick={() => setIsShowDialog(true)}
                                 style={{
                                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                     backgroundColor: '#4285f4'
@@ -138,7 +135,7 @@ export default function TextSelector() {
                             </ActionIcon>
                         </Popover.Target>
                     </Popover>
-                    {isDialogOpen && (
+                    {isShowDialog && (
                         <Box>
                             <Dialog 
                                 selectedText={selectedText} 

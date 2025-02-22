@@ -18,6 +18,12 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
     const [analysisResult, setAnalysisResult] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
+    useEffect(() => {
+        if (status !== 'needLogin') {
+            fetchAnalysis();
+        }
+    }, [selectedText, contextData]);
+
     const handleLogin = async () => {
         try {
             setStatus('loggingIn');
@@ -70,12 +76,6 @@ ${contextData.after}
             setErrorMessage(err instanceof Error ? err.message : '予期せぬエラーが発生しました');
         }
     };
-
-    useEffect(() => {
-        if (status !== 'needLogin') {
-            fetchAnalysis();
-        }
-    }, [selectedText, contextData]);
 
     const renderGoogleButton = () => (
         <button
