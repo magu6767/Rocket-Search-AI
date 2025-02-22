@@ -1,8 +1,7 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { MantineProvider } from '@mantine/core';
 import TextSelector from './TextSelector';
-
+import { StrictMode } from 'react';
 // Shadow DOMのルート要素を作成
 const contentRoot = document.createElement('text-extension-root');
 document.body.appendChild(contentRoot);
@@ -25,9 +24,9 @@ shadowRoot.appendChild(shadowWrapper);
 // Reactアプリケーションをマウント
 const root = createRoot(shadowWrapper);
 root.render(
-    <React.StrictMode>
+    <StrictMode>
         <MantineProvider>
             <TextSelector />
         </MantineProvider>
-    </React.StrictMode>
+    </StrictMode>
 ); 

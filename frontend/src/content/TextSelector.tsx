@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ActionIcon, Box, Popover } from '@mantine/core';
 import { useClickOutside } from '@mantine/hooks';
 import Dialog from './Dialog';
@@ -23,26 +23,19 @@ export default function TextSelector() {
         after: ''
     });
 
+    useEffect(() => {
+        document.addEventListener('mouseup', handleTextSelection);
+        
+        // クリーンアップ関数でイベントリスナーを削除
+        return () => {
+            document.removeEventListener('mouseup', handleTextSelection);
+        };
+    }, []); // 空の依存配列で一度だけ実行
+
     useClickOutside(() => {
         setIsShowButton(false);
         setIsShowDialog(false);
     }, null, [button]);
-
-    const handleTextSelection = () => {
-        const selection = window.getSelection();
-        if (selection && selection.toString().trim() !== '') {
-            const range = selection.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-            const text = selection.toString().trim();
-            setSelectedText(text);
-            setButtonPosition({
-                x: rect.left,
-                y: rect.bottom + window.scrollY
-            });
-            setContextData(getContextualText(selection));
-            setIsShowButton(true);
-        }
-    };
 
     const getContextualText = (selection: Selection): ContextData => {
         const range = selection.getRangeAt(0);
@@ -88,7 +81,21 @@ export default function TextSelector() {
         };
     };
 
-    document.addEventListener('mouseup', handleTextSelection);
+    const handleTextSelection = () => {
+        const selection = window.getSelection();
+        if (selection && selection.toString().trim() !== '') {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const text = selection.toString().trim();
+            setSelectedText(text);
+            setButtonPosition({
+                x: rect.left,
+                y: rect.bottom + window.scrollY
+            });
+            setContextData(getContextualText(selection));
+            setIsShowButton(true);
+        }
+    };
 
     return (
         <>
