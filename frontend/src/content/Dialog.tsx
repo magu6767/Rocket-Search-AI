@@ -72,7 +72,9 @@ ${contextData.after}
     };
 
     useEffect(() => {
-        fetchAnalysis();
+        if (status !== 'needLogin') {
+            fetchAnalysis();
+        }
     }, [selectedText, contextData]);
 
     const renderGoogleButton = () => (
