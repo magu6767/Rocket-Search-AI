@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader } from '@mantine/core';
 
 interface DialogProps {
@@ -13,7 +13,7 @@ interface DialogProps {
 
 type AnalysisStatus = 'loading' | 'error' | 'success' | 'needLogin' | 'loggingIn';
 
-export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
+export default function Dialog({selectedText, contextData}: DialogProps) {
     const [status, setStatus] = useState<AnalysisStatus>('loading');
     const [analysisResult, setAnalysisResult] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');

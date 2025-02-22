@@ -1,21 +1,14 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { TextSelector } from './TextSelector';
-import './content.css';
 import { MantineProvider } from '@mantine/core';
+import TextSelector from './TextSelector';
 
 // Shadow DOMのルート要素を作成
 const contentRoot = document.createElement('text-extension-root');
-contentRoot.style.display = 'contents';
 document.body.appendChild(contentRoot);
 
 // Shadow DOMを作成
 const shadowRoot = contentRoot.attachShadow({ mode: 'open' });
-
-// スタイルシートを追加
-const styleSheet = document.createElement('link');
-styleSheet.rel = 'stylesheet';
-shadowRoot.appendChild(styleSheet);
 
 // Shadow DOM内のReactルート要素を作成
 const shadowWrapper = document.createElement('div');

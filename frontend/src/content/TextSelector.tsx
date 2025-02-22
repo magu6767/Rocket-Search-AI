@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ActionIcon, Box, Popover } from '@mantine/core';
 import { useClickOutside } from '@mantine/hooks';
-import { Dialog } from './Dialog';
+import Dialog from './Dialog';
 
 interface ContextData {
     pageTitle: string;
@@ -10,7 +10,7 @@ interface ContextData {
     after: string;
 }
 
-export const TextSelector: React.FC = () => {
+export default function TextSelector() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isShowButton, setIsShowButton] = useState(false);
     const [button, setButton] = useState<HTMLDivElement | null>(null);
