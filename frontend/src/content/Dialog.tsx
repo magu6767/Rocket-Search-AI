@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { Loader } from '@mantine/core';
+
 interface DialogProps {
     selectedText: string;
     contextData: {
@@ -9,6 +12,46 @@ interface DialogProps {
 }
 
 export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchAnalysis = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const contextText = `
+ページタイトル: ${contextData.pageTitle}
+見出し: ${contextData.heading || '(見出しなし)'}
+前の文脈:
+${contextData.before}
+選択されたテキスト:
+${selectedText}
+後の文脈:
+${contextData.after}
+                `.trim();
+
+                const response = await chrome.runtime.sendMessage({
+                    action: 'fetchDictionary',
+                    text: contextText
+                });
+
+                if (response.error) {
+                    throw new Error(response.message);
+                }
+
+                setAnalysisResult(response.result);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : '分析中にエラーが発生しました');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAnalysis();
+    }, [selectedText, contextData]);
+
     return (
         <div>
             <div
@@ -25,44 +68,35 @@ export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <button
-                    style={{
-                        position: 'absolute',
-                        right: '10px',
-                        top: '10px',
-                        border: 'none',
-                        background: 'none',
-                        fontSize: '20px',
-                        cursor: 'pointer',
-                    }}
-                >
-                    ×
-                </button>
-                <h2 style={{ marginTop: 0, marginBottom: '15px' }}>選択されたテキスト</h2>
-                <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-                    <div style={{ fontSize: '0.9em', color: '#666', marginBottom: '5px' }}>
-                        ページ: {contextData.pageTitle}
-                        {contextData.heading && <span> | 見出し: {contextData.heading}</span>}
-                    </div>
-                    <div style={{ color: '#666' }}>{contextData.before}</div>
-                    <div style={{ margin: '10px 0', fontWeight: 'bold' }}>{selectedText}</div>
-                    <div style={{ color: '#666' }}>{contextData.after}</div>
+                <div style={{ marginTop: '20px' }}>
+                    {isLoading ? (
+                        <div style={{ textAlign: 'center', padding: '20px' }}>
+                            <Loader size="md" />
+                            <div style={{ marginTop: '10px', color: '#666' }}>分析中...</div>
+                        </div>
+                    ) : error ? (
+                        <div style={{ 
+                            padding: '10px', 
+                            backgroundColor: '#fff3f3', 
+                            color: '#d63031',
+                            borderRadius: '4px',
+                            marginBottom: '15px' 
+                        }}>
+                            {error}
+                        </div>
+                    ) : (
+                        <div style={{ 
+                            whiteSpace: 'pre-wrap',
+                            backgroundColor: '#f8f9fa',
+                            padding: '15px',
+                            borderRadius: '4px',
+                            fontSize: '0.95em',
+                            lineHeight: '1.5'
+                        }}>
+                            {analysisResult}
+                        </div>
+                    )}
                 </div>
-                <button
-                    onClick={() => {
-                        console.log('コンテキストデータ:', { selectedText, ...contextData });
-                    }}
-                    style={{
-                        backgroundColor: '#4285f4',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                    }}
-                >
-                    コンソールに表示
-                </button>
             </div>
         </div>
     );
