@@ -22,13 +22,15 @@ export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
         try {
             setStatus('loggingIn');
             const result = await chrome.runtime.sendMessage({ action: 'signIn' });
+            
             if (result.success) {
-                // ログイン後に分析を再実行
                 await fetchAnalysis();
+            } else {
+                throw new Error('ログインに失敗しました');
             }
         } catch (err) {
             setStatus('error');
-            setErrorMessage('ログインに失敗しました');
+            setErrorMessage('ログインに失敗しました。もう一度お試しください。');
         }
     };
 
@@ -80,8 +82,11 @@ ${contextData.after}
                 border: 'none',
                 background: 'none',
                 padding: 0,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                opacity: status === 'loggingIn' ? 0.7 : 1,
+                pointerEvents: status === 'loggingIn' ? 'none' : 'auto'
             }}
+            disabled={status === 'loggingIn'}
         >
             <img 
                 src={chrome.runtime.getURL('src/content/web_neutral_sq_SI.svg')}
@@ -89,7 +94,6 @@ ${contextData.after}
             />
         </button>
     );
-
 
     const renderContent = () => {
         switch (status) {
@@ -104,8 +108,10 @@ ${contextData.after}
             case 'loggingIn':
                 return (
                     <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <Loader size="md" />
-                        <div style={{ marginTop: '10px', color: '#666' }}>ログインページに遷移します...</div>
+                        <div style={{ marginBottom: '15px', color: '#666' }}>
+                            Googleアカウントでログインしています...
+                        </div>
+                        <Loader size="sm" />
                     </div>
                 );
 
@@ -120,6 +126,11 @@ ${contextData.after}
                     }}>
                         <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>エラーが発生しました</div>
                         <div>{errorMessage}</div>
+                        {errorMessage.includes('ログイン') && (
+                            <div style={{ marginTop: '15px', textAlign: 'center' }}>
+                                {renderGoogleButton()}
+                            </div>
+                        )}
                     </div>
                 );
 
