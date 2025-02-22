@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader, Button} from '@mantine/core';
+import { Loader } from '@mantine/core';
 
 interface DialogProps {
     selectedText: string;
@@ -11,7 +11,7 @@ interface DialogProps {
     };
 }
 
-type AnalysisStatus = 'loading' | 'error' | 'success' | 'needLogin';
+type AnalysisStatus = 'loading' | 'error' | 'success' | 'needLogin' | 'loggingIn';
 
 export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
     const [status, setStatus] = useState<AnalysisStatus>('loading');
@@ -20,10 +20,12 @@ export const Dialog: React.FC<DialogProps> = ({selectedText, contextData}) => {
 
     const handleLogin = async () => {
         try {
-            setStatus('loading');
-            await chrome.runtime.sendMessage({ action: 'signIn' });
-            // ログイン後に分析を再実行
-            fetchAnalysis();
+            setStatus('loggingIn');
+            const result = await chrome.runtime.sendMessage({ action: 'signIn' });
+            if (result.success) {
+                // ログイン後に分析を再実行
+                await fetchAnalysis();
+            }
         } catch (err) {
             setStatus('error');
             setErrorMessage('ログインに失敗しました');
@@ -71,6 +73,24 @@ ${contextData.after}
         fetchAnalysis();
     }, [selectedText, contextData]);
 
+    const renderGoogleButton = () => (
+        <button
+            onClick={handleLogin}
+            style={{
+                border: 'none',
+                background: 'none',
+                padding: 0,
+                cursor: 'pointer'
+            }}
+        >
+            <img 
+                src={chrome.runtime.getURL('src/content/web_neutral_sq_SI.svg')}
+                alt="Googleでログイン"
+            />
+        </button>
+    );
+
+
     const renderContent = () => {
         switch (status) {
             case 'loading':
@@ -78,6 +98,14 @@ ${contextData.after}
                     <div style={{ textAlign: 'center', padding: '20px' }}>
                         <Loader size="md" />
                         <div style={{ marginTop: '10px', color: '#666' }}>分析中...</div>
+                    </div>
+                );
+
+            case 'loggingIn':
+                return (
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <Loader size="md" />
+                        <div style={{ marginTop: '10px', color: '#666' }}>ログインページに遷移します...</div>
                     </div>
                 );
 
@@ -101,14 +129,7 @@ ${contextData.after}
                         <div style={{ marginBottom: '15px', color: '#666' }}>
                             分析を行うにはログインが必要です
                         </div>
-                        <Button
-                            // leftSection={<IconLogin size={16} />}
-                            onClick={handleLogin}
-                            variant="filled"
-                            color="blue"
-                        >
-                            ログイン
-                        </Button>
+                        {renderGoogleButton()}
                     </div>
                 );
 
