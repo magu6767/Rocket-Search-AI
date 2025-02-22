@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { TextSelector } from './TextSelector';
 import './content.css';
+import { MantineProvider } from '@mantine/core';
 
 // Shadow DOMのルート要素を作成
 const contentRoot = document.createElement('text-extension-root');
@@ -19,7 +20,7 @@ shadowRoot.appendChild(styleSheet);
 // Shadow DOM内のReactルート要素を作成
 const shadowWrapper = document.createElement('div');
 shadowWrapper.id = 'text-extension-wrapper';
-shadowWrapper.style.position = 'fixed';
+shadowWrapper.style.position = 'absolute';
 shadowWrapper.style.top = '0';
 shadowWrapper.style.left = '0';
 shadowWrapper.style.width = '100%';
@@ -32,6 +33,8 @@ shadowRoot.appendChild(shadowWrapper);
 const root = createRoot(shadowWrapper);
 root.render(
     <React.StrictMode>
-        <TextSelector />
+        <MantineProvider>
+            <TextSelector />
+        </MantineProvider>
     </React.StrictMode>
 ); 

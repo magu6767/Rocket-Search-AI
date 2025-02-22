@@ -1,76 +1,73 @@
 import React, { useState, useEffect } from 'react';
+import { Button, Box, Popover } from '@mantine/core';
+import { useClickOutside } from '@mantine/hooks';
 import { Dialog } from './Dialog';
 
 export const TextSelector: React.FC = () => {
-    const [selectedText, setSelectedText] = useState<string>('');
-    const [isShowButton, setIsShowButton] = useState(false);
-    const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isShowButton, setIsShowButton] = useState(false);
+    const [button, setButton] = useState<HTMLDivElement | null>(null);
+    const [selectedText, setSelectedText] = useState('');
+    const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
-        const handleMouseUp = () => {
+        const handleTextSelection = () => {
             const selection = window.getSelection();
-            if (selection && selection.toString().trim()) {
-                const text = selection.toString().trim();
-                setSelectedText(text);
-                
-                // 選択範囲の位置を取得
+            if (selection && selection.toString().trim() !== '') {
                 const range = selection.getRangeAt(0);
                 const rect = range.getBoundingClientRect();
-                
-                // ボタンの位置を選択範囲の左下に設定
+                setSelectedText(selection.toString());
                 setButtonPosition({
-                    x: rect.left + window.scrollX,
+                    x: rect.left,
                     y: rect.bottom + window.scrollY
                 });
                 setIsShowButton(true);
-            } else {
-                setIsShowButton(false);
             }
         };
 
-        document.addEventListener('mouseup', handleMouseUp);
-
-        return () => {
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
+        document.addEventListener('mouseup', handleTextSelection);
+        return () => document.removeEventListener('mouseup', handleTextSelection);
     }, []);
 
-    const handleButtonClick = () => {
-        setIsDialogOpen(true);
-    };
+    useClickOutside(() => {
+        setIsShowButton(false);
+        setIsDialogOpen(false);
+    }, null, [button]);
 
     return (
         <>
             {isShowButton && (
-                <button
-                    className="text-selector-button"
-                    onClick={handleButtonClick}
+                <Box
                     style={{
                         position: 'absolute',
                         left: `${buttonPosition.x}px`,
                         top: `${buttonPosition.y}px`,
-                        transform: 'translate(8px, 8px)', // ボタンを少し右下にオフセット
-                        backgroundColor: '#4285f4',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        zIndex: 2147483647,
-                        whiteSpace: 'nowrap', // ボタンのテキストを1行に
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        zIndex: 2147483646
                     }}
+                    ref={setButton}
                 >
-                    テキストを分析
-                </button>
+                    <Popover
+                        opened={isDialogOpen}
+                        position="bottom"
+                        withArrow
+                        shadow="md"
+                    >
+                        <Popover.Target>
+                            <Button 
+                                size="xs"
+                                onClick={() => setIsDialogOpen(true)}
+                            >
+                                選択テキストを処理
+                            </Button>
+                        </Popover.Target>
+                    </Popover>
+                    {isDialogOpen && (
+                        <Box>
+                            <Dialog selectedText={selectedText} />
+                        </Box>
+                    )}
+                </Box>
             )}
-            <Dialog
-                isOpen={isDialogOpen}
-                onClose={() => setIsDialogOpen(false)}
-                selectedText={selectedText}
-            />
         </>
     );
-}; 
+};
