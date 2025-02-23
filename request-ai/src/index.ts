@@ -33,7 +33,6 @@ const TIME_WINDOW = 86400; // 24時間（秒）
 
 // 参考：https://zenn.dev/codehex/articles/ca85a1babcc046
 const verifyJWT = async (req: Request, env: Env): Promise<string> => {
-	console.info(`[${new Date().toISOString()}] verifyJWTの開始`);
 	const authorization = req.headers.get('Authorization')
 	if (authorization === null) {
 		throw new Error("Authorization header is missing")
@@ -42,6 +41,7 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 
 	try {
 		// JWTをハッシュ化してキーとして使用
+        // これでも遅い時がある
 		const encoder = new TextEncoder();
 		const data = encoder.encode(jwt);
 		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -51,7 +51,6 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 		// キャッシュからuidを取得（ハッシュ化したキーを使用）
 		const cachedUid = await env.VERIFIED_TOKEN_KV.get(hashHex);
 		if (cachedUid) {
-			console.info(`[${new Date().toISOString()}] キャッシュからuidを取得`);
 			return cachedUid;
 		}
 
@@ -70,7 +69,6 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 			expirationTtl: 3600 // 1時間
 		});
 
-		console.info(`[${new Date().toISOString()}] verifyJWTの終了`);
 		return uid;
 	} catch (error: any) {
 		console.error('Detailed error:', {
@@ -156,7 +154,6 @@ ${text}`;
 					try {
 						for await (const chunk of result.stream) {
 							const chunkText = chunk.text();
-							console.info('Sending chunk:', chunkText);
 							if (chunkText) {
 								// SSE形式でデータを送信
 								const message = `data: ${JSON.stringify({ result: chunkText })}\n\n`;
