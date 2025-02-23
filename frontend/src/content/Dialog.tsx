@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader } from '@mantine/core';
+import ReactMarkdown from 'react-markdown';
 
 interface DialogProps {
     selectedText: string;
@@ -131,14 +132,13 @@ ${contextData.after}
             case 'success':
                 return (
                     <div style={{ 
-                        whiteSpace: 'pre-wrap',
                         backgroundColor: '#f8f9fa',
                         padding: '15px',
                         borderRadius: '4px',
                         fontSize: '0.95em',
                         lineHeight: '1.5'
                     }}>
-                        {analysisResult}
+                        <ReactMarkdown>{analysisResult}</ReactMarkdown>
                     </div>
                 );
 

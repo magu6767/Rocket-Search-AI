@@ -28,7 +28,7 @@ interface RequestData {
 	text: string;
 }
 
-const DAILY_LIMIT = 10; // 1日あたりのリクエスト制限
+const DAILY_LIMIT = 30; // 1日あたりのリクエスト制限
 const TIME_WINDOW = 86400; // 24時間（秒）
 
 // 参考：https://zenn.dev/codehex/articles/ca85a1babcc046

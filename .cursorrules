@@ -9,10 +9,12 @@
   - **Content Script**: ウェブページに注入され、ユーザーが選択したテキストをキャプチャしAIに送信
   - **Background Script**: Content Scriptとバックエンド間の通信を管理  
   - crxjs/vite-pluginを使用しており、マニフェストはvite.config.tsに記載
+  - パッケージ管理はpnpmで行う
   ※フロントエンド内には「Chrome拡張におけるバックエンドスクリプト」も含まれています。これらはCloudflare Workersのスクリプトと混同しないように注意すること。
 
 - **バックエンド**: Cloudflare Workers上で動作する "request-ai"  
   - ファイル群は/request-aiに格納
+  - パッケージ管理はnpmで行う
   - Cloudflare Workersは、Chrome拡張からのリクエストを受け取り、Gemini APIと連携して解析を行います。
 
 ## 基本の動線
