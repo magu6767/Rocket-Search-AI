@@ -137,7 +137,7 @@ export default {
 
 			// Gemini APIクライアントの初期化
 			const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
-			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+			const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-preview-02-05" });
 
 			// ストリームレスポンスの生成
 			const prompt = `以下の選択されたテキストを分析して日本語で出力してください。
@@ -155,9 +155,12 @@ ${text}`;
 						for await (const chunk of result.stream) {
 							const chunkText = chunk.text();
 							if (chunkText) {
-								// SSE形式でデータを送信
-								const message = `data: ${JSON.stringify({ result: chunkText })}\n\n`;
-								controller.enqueue(encoder.encode(message));
+								// 文字単位で分割してキューに入れる
+								for (const char of chunkText) {
+									// SSE形式でデータを送信
+									const message = `data: ${JSON.stringify({ result: char })}\n\n`;
+									controller.enqueue(encoder.encode(message));
+								}
 							}
 						}
 						// ストリーム終了を通知
