@@ -15,5 +15,9 @@
 		"typescript": "^5.5.2",
 		"vitest": "~2.1.9",
 		"wrangler": "^3.108.1"
+	},
+	"dependencies": {
+		"firebase-auth-cloudflare-workers": "^2.0.6",
+		"@google/generative-ai": "^0.22.0"
 	}
 }

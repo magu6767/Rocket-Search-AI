@@ -83,7 +83,6 @@ const fetchDictionary = async (text: string, idToken: string) => {
 
     if (!response.ok) {
       if (response.status === 401) {
-        // トークンが無効な場合は認証エラーとして処理
         await chrome.storage.local.remove('idToken');
         throw new Error('認証が必要です');
       }
@@ -91,8 +90,19 @@ const fetchDictionary = async (text: string, idToken: string) => {
       throw new Error(`APIリクエストに失敗しました: ${response.status} ${errorText}`);
     }
 
-    const data = await response.json();
-    return { error: false, result: data.result };
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+
+    if (!reader) {
+      throw new Error('Failed to create stream reader');
+    }
+
+    return {
+      error: false,
+      stream: true,
+      reader,
+      decoder
+    };
   } catch (error) {
     console.error('API呼び出しエラー:', error);
     return {
@@ -102,7 +112,7 @@ const fetchDictionary = async (text: string, idToken: string) => {
   }
 };
 
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'signIn') {
     (async () => {
       try {
@@ -115,7 +125,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         });
       }
     })();
-    return true; // 非同期レスポンスを示すためにtrueを返す
+    return true;
   }
   
   if (request.action === 'fetchDictionary') {
@@ -129,8 +139,82 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
           });
           return;
         }
-        const result = await fetchDictionary(request.text, idToken);
-        sendResponse(result);
+
+        const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${idToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text: request.text })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            await chrome.storage.local.remove('idToken');
+            throw new Error('認証が必要です');
+          }
+          const errorText = await response.text();
+          throw new Error(`APIリクエストに失敗しました: ${response.status} ${errorText}`);
+        }
+
+        // ストリームの開始を通知
+        sendResponse({
+          error: false,
+          stream: true,
+          message: 'stream_start'
+        });
+
+        // SSEリーダーの設定
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        if (!reader) {
+          throw new Error('Failed to create stream reader');
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          
+          // 最後の行は完全でない可能性があるため、バッファに残す
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.trim() && line.startsWith('data: ')) {
+              const data = line.slice(6).trim();
+              
+              if (data === '[DONE]') {
+                // ストリームの終了を通知
+                chrome.tabs.sendMessage(sender.tab!.id!, {
+                  action: 'streamEnd'
+                });
+                return;
+              }
+
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.error) {
+                  throw new Error(parsed.error);
+                }
+                if (parsed.result) {
+                  // Content Scriptにチャンクを送信
+                  chrome.tabs.sendMessage(sender.tab!.id!, {
+                    action: 'streamChunk',
+                    chunk: parsed.result
+                  });
+                }
+              } catch (e) {
+                console.error('Failed to parse chunk:', e);
+              }
+            }
+          }
+        }
+
       } catch (error) {
         sendResponse({
           error: true,
@@ -138,6 +222,6 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         });
       }
     })();
-    return true; // 非同期レスポンスを示すためにtrueを返す
+    return true;
   }
 });

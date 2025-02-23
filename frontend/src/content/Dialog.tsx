@@ -11,17 +11,33 @@ interface DialogProps {
     };
 }
 
-type AnalysisStatus = 'loading' | 'error' | 'success' | 'needLogin' | 'loggingIn';
+type AnalysisStatus = 'loading' | 'error' | 'success' | 'needLogin' | 'loggingIn' | 'streaming';
 
 export default function Dialog({selectedText, contextData}: DialogProps) {
     const [status, setStatus] = useState<AnalysisStatus>('loading');
-    const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+    const [analysisResult, setAnalysisResult] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>('');
 
     useEffect(() => {
         if (status !== 'needLogin') {
             fetchAnalysis();
         }
+
+        // ストリームデータの受信リスナーを設定
+        const handleStreamChunk = (message: any) => {
+            if (message.action === 'streamChunk') {
+                setStatus('streaming');
+                setAnalysisResult(prev => prev + message.chunk);
+            } else if (message.action === 'streamEnd') {
+                setStatus('success');
+            }
+        };
+
+        chrome.runtime.onMessage.addListener(handleStreamChunk);
+
+        return () => {
+            chrome.runtime.onMessage.removeListener(handleStreamChunk);
+        };
     }, [selectedText, contextData]);
 
     const handleLogin = async () => {
@@ -42,6 +58,7 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
 
     const fetchAnalysis = async () => {
         setStatus('loading');
+        setAnalysisResult('');
         try {
             const contextText = `
 ページタイトル: ${contextData.pageTitle}
@@ -69,8 +86,11 @@ ${contextData.after}
                 return;
             }
 
-            setAnalysisResult(response.result);
-            setStatus('success');
+            if (!response.stream) {
+                setAnalysisResult(response.result);
+                setStatus('success');
+            }
+            // ストリームの場合は、onMessageリスナーで処理
         } catch (err) {
             setStatus('error');
             setErrorMessage(err instanceof Error ? err.message : '予期せぬエラーが発生しました');
@@ -107,13 +127,18 @@ ${contextData.after}
                     </div>
                 );
 
-            case 'loggingIn':
+            case 'streaming':
+            case 'success':
                 return (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <div style={{ marginBottom: '15px', color: '#666' }}>
-                            Googleアカウントでログインしています...
-                        </div>
-                        <Loader size="sm" />
+                    <div style={{ 
+                        whiteSpace: 'pre-wrap',
+                        backgroundColor: '#f8f9fa',
+                        padding: '15px',
+                        borderRadius: '4px',
+                        fontSize: '0.95em',
+                        lineHeight: '1.5'
+                    }}>
+                        {analysisResult}
                     </div>
                 );
 
@@ -146,17 +171,13 @@ ${contextData.after}
                     </div>
                 );
 
-            case 'success':
+            case 'loggingIn':
                 return (
-                    <div style={{ 
-                        whiteSpace: 'pre-wrap',
-                        backgroundColor: '#f8f9fa',
-                        padding: '15px',
-                        borderRadius: '4px',
-                        fontSize: '0.95em',
-                        lineHeight: '1.5'
-                    }}>
-                        {analysisResult}
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <div style={{ marginBottom: '15px', color: '#666' }}>
+                            Googleアカウントでログインしています...
+                        </div>
+                        <Loader size="sm" />
                     </div>
                 );
         }
