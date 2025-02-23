@@ -199,7 +199,6 @@ ${contextData.after}
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 style={{ marginTop: 0, marginBottom: '15px' }}>分析結果</h2>
                 {renderContent()}
             </div>
         </div>

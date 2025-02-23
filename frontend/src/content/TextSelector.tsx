@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ActionIcon, Box, Popover } from '@mantine/core';
+import { Box, Group } from '@mantine/core';
 import { useClickOutside } from '@mantine/hooks';
+import { IoRocketSharp } from "react-icons/io5";
 import Dialog from './Dialog';
 
 interface ContextData {
@@ -100,48 +101,47 @@ export default function TextSelector() {
     return (
         <>
             {isShowButton && (
-                <Box
+                <Group
                     style={{
                         position: 'absolute',
                         left: `${buttonPosition.x}px`,
                         top: `${buttonPosition.y}px`,
-                        zIndex: 2147483646
+                        zIndex: 2147483646,
                     }}
                     ref={setButton}
                 >
-                    <Popover
-                        opened={isShowDialog}
-                        position="bottom"
-                        withArrow
-                        shadow="md"
+                    <button
+                        style={{
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '50%',
+                            border: 'none',
+                            backgroundColor: 'white',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 8px 8px rgba(0,0,0,0.1)',
+                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                        }}
+                        onClick={() => setIsShowDialog(true)}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        }}
                     >
-                        <Popover.Target>
-                            <ActionIcon
-                                variant="filled"
-                                color="blue"
-                                radius="xl"
-                                size="md"
-                                onClick={() => setIsShowDialog(true)}
-                                style={{
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                    backgroundColor: '#4285f4'
-                                }}
-                            >
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                                </svg>
-                            </ActionIcon>
-                        </Popover.Target>
-                    </Popover>
+                        <IoRocketSharp 
+                            size={20}
+                            style={{
+                                color: 'black',
+                                strokeWidth: 1.5
+                            }}
+                        />
+                    </button>
                     {isShowDialog && (
                         <Box>
                             <Dialog 
@@ -150,7 +150,7 @@ export default function TextSelector() {
                             />
                         </Box>
                     )}
-                </Box>
+                </Group>
             )}
         </>
     );
