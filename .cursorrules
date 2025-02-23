@@ -1,0 +1,27 @@
+# .cursorrules
+
+## 概要
+このルールは、Cursorでの開発を効率化するためのガイドラインです。プロジェクトはモノレポ構成となっており、以下の2つの主要なパートで構成されています。
+
+- **フロントエンド**: Chrome拡張機能として実装 (React + TypeScript)  
+  - ファイル群は/frontendに格納
+  - **Popup**: 拡張アイコンをクリックした際に表示されるUI
+  - **Content Script**: ウェブページに注入され、ユーザーが選択したテキストをキャプチャしAIに送信
+  - **Background Script**: Content Scriptとバックエンド間の通信を管理  
+  - crxjs/vite-pluginを使用しており、マニフェストはvite.config.tsに記載
+  ※フロントエンド内には「Chrome拡張におけるバックエンドスクリプト」も含まれています。これらはCloudflare Workersのスクリプトと混同しないように注意すること。
+
+- **バックエンド**: Cloudflare Workers上で動作する "request-ai"  
+  - ファイル群は/request-aiに格納
+  - Cloudflare Workersは、Chrome拡張からのリクエストを受け取り、Gemini APIと連携して解析を行います。
+
+## 基本の動線
+1. **Content Script**: ユーザーが選択したテキストをキャプチャ
+2. **Background Script**: Content Scriptからのデータを受け取り、Cloudflare Workersに転送
+3. **Cloudflare Workers ("request-ai")**: Gemini APIへリクエストを送信し、解析結果を取得
+4. **レスポンスの逆伝播**: Gemini APIからの結果をCloudflare Workers → Background Script → Content Scriptの順で返却
+
+## 注意点
+- フロントエンドのリポジトリ内に存在する「Chrome拡張におけるバックエンドスクリプト」は、Cloudflare Workersのスクリプトとは別物であるため、混同しないように管理すること。
+- 各コンポーネント間の責務を明確にし、コードの分離と依存関係の整理を徹底すること。
+

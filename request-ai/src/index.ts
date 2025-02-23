@@ -27,7 +27,7 @@ interface GeminiResponse {
 interface Env {
 	GEMINI_API_KEY: string;
 	FIREBASE_PROJECT_ID: string;
-	CLOUDFLARE_PUBLIC_JWK_CACHE_KEY: string;
+	CLOUDFLARE_PUBLIC_JWK_CACHE_KEY: string; // 好きな名前でOK、ここで設定した名前でKeyとValue（公開鍵）が登録される
 	CLOUDFLARE_PUBLIC_JWK_CACHE_KV: KVNamespace;
 	RATE_LIMIT_KV: KVNamespace;
 }
@@ -39,14 +39,17 @@ interface RequestData {
 const DAILY_LIMIT = 10; // 1日あたりのリクエスト制限
 const TIME_WINDOW = 86400; // 24時間（秒）
 
+// 参考：https://zenn.dev/codehex/articles/ca85a1babcc046
 const verifyJWT = async (req: Request, env: Env): Promise<FirebaseIdToken> => {
 	const authorization = req.headers.get('Authorization')
 	if (authorization === null) {
 		throw new Error("Authorization header is missing")
 	}
+    // AuthorizationヘッダーからFirebaseのidTokenを取得
 	const jwt = authorization.replace(/Bearer\s+/i, "")
 
 	try {
+        // KVの初期化
 		const kvStore = WorkersKVStoreSingle.getOrInitialize(
 			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KEY,
 			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KV

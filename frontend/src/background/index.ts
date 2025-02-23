@@ -14,8 +14,10 @@ initializeApp(firebaseConfig);
 
 console.log('background.ts');
 
+// 参考：https://zenn.dev/karabiner_inc/articles/7197d6565ec2d4
 const signIn = async (): Promise<{ success: boolean; error?: string }> => {
   try {
+    // マニフェストからOAuth2の設定を取得
     const manifest = chrome.runtime.getManifest();
     const oauth2Manifest = manifest.oauth2;
     if (!oauth2Manifest) {
@@ -27,8 +29,10 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
       throw new Error('OAuth2のスコープが設定されていません');
     }
 
+    // 認証URLを生成
     const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(chrome.identity.getRedirectURL())}&response_type=token&scope=${encodeURIComponent(scopes.join(' '))}`;
 
+    // Google側での認証（ユーザーがGoogleアカウントを使用して認証を行う）
     const responseUrl = await chrome.identity.launchWebAuthFlow({
       interactive: true,
       url: authUrl
@@ -38,6 +42,7 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
       return { success: false, error: 'ログインがキャンセルされました' };
     }
 
+    // URLからアクセストークンを取得
     const searchParams = new URL(responseUrl.replace(/#/, '?')).searchParams;
     const token = searchParams.get('access_token');
     if (!token) {
@@ -45,8 +50,11 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     }
 
     const auth = getAuth();
+    // Google の OAuth トークン（アクセストークン）を Firebase が理解できる credential に変換する
     const credential = GoogleAuthProvider.credential(null, token);
 
+    // 生成した credential を Firebase サーバーに送信し、トークンの正当性を検証する
+    // 検証成功後、idTokenを取得し、Firebase はユーザーアカウントを作成または取得し、認証状態を確立する
     const userCredential = await signInWithCredential(auth, credential);
     const idToken = await userCredential.user.getIdToken();
     await chrome.storage.local.set({ idToken });
@@ -61,6 +69,7 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
   }
 };
 
+// ここのidTokenは、FirebaseのidToken
 const fetchDictionary = async (text: string, idToken: string) => {
   try {
     const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
