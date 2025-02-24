@@ -91,14 +91,10 @@ const refreshIdToken = async (refreshToken: string) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`トークンのリフレッシュに失敗しました: ${errorData.error?.message || '不明なエラー'}`);
+      throw new Error(`再度ログインしてください`);
     }
 
     const data = await response.json();
-    if (!data.id_token) {
-      throw new Error('リフレッシュトークンのレスポンスにid_tokenが含まれていません');
-    }
 
     return data.id_token;
   } catch (error) {
@@ -159,17 +155,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           // それ以外のエラーの場合はトークンをリフレッシュして再試行
           const { refreshToken } = await chrome.storage.local.get('refreshToken');
           if (refreshToken) {
-            try {
-              const refreshedIdToken = await refreshIdToken(refreshToken);
-              await chrome.storage.local.set({ idToken: refreshedIdToken });
-              const retryResponse = await fetchDictionary(request.text, refreshedIdToken);
-              if (!retryResponse.ok) {
-                throw new Error(`APIリクエストに失敗しました: ${retryResponse.status}`);
-              }
-              response = retryResponse;
-            } catch (error) {
-              throw new Error('再度ログインしてください');
+            const refreshedIdToken = await refreshIdToken(refreshToken);
+            await chrome.storage.local.set({ idToken: refreshedIdToken });
+            const retryResponse = await fetchDictionary(request.text, refreshedIdToken);
+            if (!retryResponse.ok) {
+              throw new Error(`APIリクエストに失敗しました: ${ await retryResponse.text()}`);
             }
+            response = retryResponse;
           } else {
             throw new Error('再度ログインしてください');
           }
