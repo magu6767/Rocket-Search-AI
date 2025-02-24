@@ -144,6 +144,15 @@ ${contextData.after}
                         }}>
                             分析中...
                         </div>
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            left: '20px',
+                            color: '#666',
+                            fontSize: '0.8em'
+                        }}>
+                            Rocket Search AIに個人情報や機密情報を送らないでください。
+                        </div>
                         <style>
                             {`
                                 @keyframes spin {
