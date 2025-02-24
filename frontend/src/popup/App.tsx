@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { IoRocketSharp } from "react-icons/io5";
 import './App.css'
 
 function App() {
@@ -73,6 +74,7 @@ function App() {
       backgroundColor: 'white',
       textAlign: 'center'
     }}>
+      <IoRocketSharp size={40} />
       <h2 style={{
         fontSize: '1.2em',
         marginBottom: '20px',
