@@ -106,7 +106,6 @@ export default function TextSelector() {
                         position: 'absolute',
                         left: `${buttonPosition.x}px`,
                         top: `${buttonPosition.y}px`,
-                        backgroundColor: 'red',
                         zIndex: 2147483646,
                     }}
                     ref={setButton}

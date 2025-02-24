@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Loader } from '@mantine/core';
 import ReactMarkdown from 'react-markdown';
+import { IoRocketSharp } from "react-icons/io5";
 
 interface DialogProps {
     selectedText: string;
@@ -123,8 +123,40 @@ ${contextData.after}
             case 'loading':
                 return (
                     <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <Loader size="md" />
-                        <div style={{ marginTop: '10px', color: '#666' }}>分析中...</div>
+                        <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto' }}>
+                            <div style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '50%',
+                                border: '3px solid #f3f3f3',
+                                borderTop: '3px solid #646cff',
+                                animation: 'spin 1s linear infinite'
+                            }} />
+                        </div>
+                        <div style={{ 
+                            marginTop: '10px', 
+                            color: '#666',
+                            animation: 'fadeInOut 1.5s ease-in-out infinite'
+                        }}>
+                            分析中...
+                        </div>
+                        <style>
+                            {`
+                                @keyframes spin {
+                                    from { transform: translate(-50%, -50%) rotate(0deg); }
+                                    to { transform: translate(-50%, -50%) rotate(360deg); }
+                                }
+                                @keyframes fadeInOut {
+                                    0% { opacity: 0.4; }
+                                    50% { opacity: 1; }
+                                    100% { opacity: 0.4; }
+                                }
+                            `}
+                        </style>
                     </div>
                 );
 
@@ -177,7 +209,6 @@ ${contextData.after}
                         <div style={{ marginBottom: '15px', color: '#666' }}>
                             Googleアカウントでログインしています...
                         </div>
-                        <Loader size="sm" />
                     </div>
                 );
         }
@@ -191,9 +222,17 @@ ${contextData.after}
                     padding: '20px',
                     borderRadius: '8px',
                     width: '400px',
+                    position: 'relative'
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
+                <div style={{
+                    position: 'absolute',
+                    top: '15px',
+                    right: '15px',
+                }}>
+                    <IoRocketSharp size={30} />
+                </div>
                 {renderContent()}
             </div>
         </div>
