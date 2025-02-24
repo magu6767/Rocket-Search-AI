@@ -2,17 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBD03JuDxiNNz-yZGi8CJrTjj2LiCR6FUU",
-  authDomain: "web-extention.firebaseapp.com",
-  projectId: "web-extention",
-  storageBucket: "web-extention.firebasestorage.app",
-  messagingSenderId: "503808106062",
-  appId: "1:503808106062:web:349c320b47f90a181fed1f"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 initializeApp(firebaseConfig);
-
-console.log('background.ts');
 
 // 参考：https://zenn.dev/karabiner_inc/articles/7197d6565ec2d4
 const signIn = async (): Promise<{ success: boolean; error?: string }> => {
@@ -57,8 +55,9 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     // 検証成功後、idTokenを取得し、Firebase はユーザーアカウントを作成または取得し、認証状態を確立する
     const userCredential = await signInWithCredential(auth, credential);
     const idToken = await userCredential.user.getIdToken();
+    const refreshToken = await userCredential.user.refreshToken;
     await chrome.storage.local.set({ idToken });
-
+    await chrome.storage.local.set({ refreshToken });
     return { success: true };
   } catch (error) {
     console.error('ログインエラー:', error);
@@ -69,48 +68,45 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
   }
 };
 
-// ここのidTokenは、FirebaseのidToken
 const fetchDictionary = async (text: string, idToken: string) => {
+  const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${idToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text: text })
+  });
+  return response;
+};
+
+const refreshIdToken = async (refreshToken: string) => {
   try {
-    const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
+    const response = await fetch(`https://securetoken.googleapis.com/v1/token?key=${import.meta.env.VITE_FIREBASE_API_KEY}`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${idToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ 
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token'
+      })
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        await chrome.storage.local.remove('idToken');
-        throw new Error('認証が必要です');
-      }
-      const errorText = await response.text();
-      throw new Error(`APIリクエストに失敗しました: ${response.status} ${errorText}`);
+      const errorData = await response.json();
+      throw new Error(`トークンのリフレッシュに失敗しました: ${errorData.error?.message || '不明なエラー'}`);
     }
 
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-
-    if (!reader) {
-      throw new Error('Failed to create stream reader');
+    const data = await response.json();
+    if (!data.id_token) {
+      throw new Error('リフレッシュトークンのレスポンスにid_tokenが含まれていません');
     }
 
-    return {
-      error: false,
-      stream: true,
-      reader,
-      decoder
-    };
+    return data.id_token;
   } catch (error) {
-    console.error('API呼び出しエラー:', error);
-    return {
-      error: true,
-      message: error instanceof Error ? error.message : '不明なエラー'
-    };
+    console.error('トークンリフレッシュエラー:', error);
+    throw new Error(error instanceof Error ? error.message : 'トークンのリフレッシュ中に予期せぬエラーが発生しました');
   }
 };
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'signIn') {
@@ -133,6 +129,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       try {
         const { idToken } = await chrome.storage.local.get('idToken');
         if (!idToken) {
+          console.log('idTokenが見つかりません');
           sendResponse({
             error: true,
             message: '認証が必要です'
@@ -140,22 +137,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           return;
         }
 
-        const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${idToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ text: request.text })
-        });
+        let response = await fetchDictionary(request.text, idToken);
 
+        // エラーが返ってきたら、リフレッシュトークンを使用してidTokenを更新する
         if (!response.ok) {
-          if (response.status === 401) {
-            await chrome.storage.local.remove('idToken');
-            throw new Error('認証が必要です');
-          }
           const errorText = await response.text();
-          throw new Error(`APIリクエストに失敗しました: ${response.status} ${errorText}`);
+          console.log('APIリクエストに失敗しました', response.status, errorText);
+
+          // 429エラーの場合はそのままエラーをスロー
+          if (response.status === 429) {
+            throw new Error(`APIリクエストに失敗しました: ${errorText}`);
+          }
+
+          // それ以外のエラーの場合はトークンをリフレッシュして再試行
+          const { refreshToken } = await chrome.storage.local.get('refreshToken');
+          if (refreshToken) {
+            try {
+              const refreshedIdToken = await refreshIdToken(refreshToken);
+              await chrome.storage.local.set({ idToken: refreshedIdToken });
+              const retryResponse = await fetchDictionary(request.text, refreshedIdToken);
+              if (!retryResponse.ok) {
+                throw new Error(`APIリクエストに失敗しました: ${retryResponse.status}`);
+              }
+              response = retryResponse;
+            } catch (error) {
+              throw new Error('再度ログインしてください');
+            }
+          } else {
+            throw new Error('再度ログインしてください');
+          }
         }
 
         // ストリームの開始を通知
