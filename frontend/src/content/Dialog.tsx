@@ -190,12 +190,7 @@ ${contextData.after}
                     backgroundColor: 'white',
                     padding: '20px',
                     borderRadius: '8px',
-                    maxWidth: '500px',
-                    width: '90%',
-                    maxHeight: '80vh',
-                    overflow: 'auto',
-                    position: 'relative',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    width: '400px',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
