@@ -8,9 +8,15 @@ dotenv.config();
 
 const manifest = defineManifest({
   manifest_version: 3,
-  name: 'Chrome拡張機能の練習',
+  name: 'Rocket Search AI',
   version: '1.0.0',
-  description: 'Zenn投稿するChrome拡張機能のサンプルです。',
+  description: 'テキストを選択すると、AIがすぐに解説してくれます。',
+  icons: {
+    "16": "src/assets/rocket-sharp-icon16.png",
+    "32": "src/assets/rocket-sharp-icon32.png",
+    "48": "src/assets/rocket-sharp-icon48.png",
+    "128": "src/assets/rocket-sharp-icon128.png"
+  },
   action: {
     default_popup: 'src/popup/popup.html',
   },
