@@ -24,9 +24,9 @@ shadowRoot.appendChild(shadowWrapper);
 // Reactアプリケーションをマウント
 const root = createRoot(shadowWrapper);
 root.render(
-    // <StrictMode>
+    <StrictMode>
         <MantineProvider>
             <TextSelector />
         </MantineProvider>
-    // </StrictMode>
+    </StrictMode>
 ); 
