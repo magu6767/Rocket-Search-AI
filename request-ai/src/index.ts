@@ -28,7 +28,7 @@ interface RequestData {
 	text: string;
 }
 
-const DAILY_LIMIT = 30; // 1日あたりのリクエスト制限
+const DAILY_LIMIT = 20; // 1日あたりのリクエスト制限
 const TIME_WINDOW = 86400; // 24時間（秒）
 
 // 参考：https://zenn.dev/codehex/articles/ca85a1babcc046
@@ -119,7 +119,7 @@ export default {
 			// レートリミットのチェック
 			const isWithinLimit = await checkRateLimit(uid, env);
 			if (!isWithinLimit) {
-				return new Response('リクエスト制限を超えました。', {
+				return new Response('リクエスト制限を超えました。一日にリクエストできるのは20回までです。\n\nしばらく待ってから再度お試しください。', {
 					status: 429,
 					headers: {
 						'Content-Type': 'application/json',

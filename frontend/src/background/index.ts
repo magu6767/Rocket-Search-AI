@@ -136,6 +136,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           });
           return;
         }
+        if (request.text.length > 10000) {
+          sendResponse({
+            error: true,
+            message: '選択されたテキストが長すぎます'
+          });
+          return;
+        }
 
         let response = await fetchDictionary(request.text, idToken);
 
@@ -146,7 +153,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
           // 429エラーの場合はそのままエラーをスロー
           if (response.status === 429) {
-            throw new Error(`APIリクエストに失敗しました: ${errorText}`);
+            throw new Error(`${errorText}`);
           }
 
           // それ以外のエラーの場合はトークンをリフレッシュして再試行
