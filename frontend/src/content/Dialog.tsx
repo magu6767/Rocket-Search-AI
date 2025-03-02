@@ -122,7 +122,7 @@ ${contextData.after}
         switch (status) {
             case 'loading':
                 return (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                    <div style={{ textAlign: 'center', padding: '20px', color: '#333' }}>
                         <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto' }}>
                             <div style={{
                                 position: 'absolute',
@@ -177,7 +177,8 @@ ${contextData.after}
                         padding: '15px',
                         borderRadius: '4px',
                         fontSize: '0.95em',
-                        lineHeight: '1.5'
+                        lineHeight: '1.5',
+                        color: '#333',
                     }}>
                         <ReactMarkdown>{analysisResult}</ReactMarkdown>
                     </div>
@@ -231,7 +232,10 @@ ${contextData.after}
                     padding: '20px',
                     borderRadius: '8px',
                     width: '400px',
-                    position: 'relative'
+                    position: 'relative',
+                    color: '#333',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    fontFamily: 'Arial, sans-serif',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
