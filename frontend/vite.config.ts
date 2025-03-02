@@ -35,7 +35,6 @@ const manifest = defineManifest({
   ],
   content_security_policy: {
     extension_pages: "script-src 'self'; object-src 'self'",
-    sandbox: "sandbox allow-scripts; script-src 'self' https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://securetoken.googleapis.com; object-src 'self'",
   },
   web_accessible_resources: [
     {
