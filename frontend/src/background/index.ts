@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithCredential, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithCredential, GoogleAuthProvider } from "firebase/auth/web-extension";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,11 +10,11 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-initializeApp(firebaseConfig);
 
 // 参考：https://zenn.dev/karabiner_inc/articles/7197d6565ec2d4
 const signIn = async (): Promise<{ success: boolean; error?: string }> => {
   try {
+    initializeApp(firebaseConfig);
     // マニフェストからOAuth2の設定を取得
     const manifest = chrome.runtime.getManifest();
     const oauth2Manifest = manifest.oauth2;
