@@ -1,0 +1,78 @@
+{
+  "appName": {
+    "message": "Rocket Search AI - ローカライズ版",
+    "description": "拡張機能の名前"
+  },
+  "appDescription": {
+    "message": "テキストを選択すると、AIがすぐに解説してくれます。",
+    "description": "拡張機能の説明"
+  },
+  "loggedIn": {
+    "message": "ログイン済みです。テキストを選択して分析を開始できます。-testststststtststst",
+    "description": "ログイン済みの表示メッセージ"
+  },
+  "loginRequired": {
+    "message": "分析を開始するにはログインしてください",
+    "description": "ログイン要求メッセージ"
+  },
+  "googleLoginAlt": {
+    "message": "Googleでログイン",
+    "description": "Googleログインボタンの代替テキスト"
+  },
+  "loading": {
+    "message": "読み込み中...",
+    "description": "読み込み中の表示"
+  },
+  "analyzing": {
+    "message": "分析中...",
+    "description": "分析中の表示"
+  },
+  "securityWarning": {
+    "message": "Rocket Search AIに個人情報や機密情報を送らないでください。",
+    "description": "セキュリティ警告"
+  },
+  "errorOccurred": {
+    "message": "エラーが発生しました",
+    "description": "エラーのタイトル"
+  },
+  "loginFailed": {
+    "message": "ログインに失敗しました。もう一度お試しください。",
+    "description": "ログイン失敗メッセージ"
+  },
+  "loginRequired2": {
+    "message": "分析を行うにはログインが必要です",
+    "description": "ダイアログ内のログイン要求メッセージ"
+  },
+  "loggingIn": {
+    "message": "Googleアカウントでログインしています...",
+    "description": "ログイン中の表示"
+  },
+  "contextPageTitle": {
+    "message": "ページタイトル",
+    "description": "コンテキストのページタイトルラベル"
+  },
+  "contextHeading": {
+    "message": "見出し",
+    "description": "コンテキストの見出しラベル"
+  },
+  "noHeading": {
+    "message": "(見出しなし)",
+    "description": "見出しがない場合の表示"
+  },
+  "contextBefore": {
+    "message": "前の文脈",
+    "description": "前の文脈ラベル"
+  },
+  "selectedText": {
+    "message": "選択されたテキスト",
+    "description": "選択されたテキストラベル"
+  },
+  "contextAfter": {
+    "message": "後の文脈",
+    "description": "後の文脈ラベル"
+  },
+  "unexpectedError": {
+    "message": "予期せぬエラーが発生しました",
+    "description": "予期せぬエラーメッセージ"
+  }
+} 

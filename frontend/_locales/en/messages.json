@@ -1,0 +1,78 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "Select text and get instant AI explanation.",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "You are logged in. Select text to start analysis.",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "Please log in to start analysis",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Sign in with Google",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "Loading...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "Analyzing...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "Do not send personal or confidential information to Rocket Search AI.",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "An error occurred",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "Login failed. Please try again.",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "Login is required to perform analysis",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Logging in with Google account...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "Page Title",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "Heading",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(No heading)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "Context Before",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "Selected Text",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "Context After",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "An unexpected error occurred",
+    "description": "Unexpected error message"
+  }
+} 

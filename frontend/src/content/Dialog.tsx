@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { IoRocketSharp } from "react-icons/io5";
+import { useTranslation } from '../utils/i18n';
 
 interface DialogProps {
     selectedText: string;
@@ -15,6 +16,7 @@ interface DialogProps {
 type AnalysisStatus = 'loading' | 'error' | 'success' | 'needLogin' | 'loggingIn' | 'streaming';
 
 export default function Dialog({selectedText, contextData}: DialogProps) {
+    const t = useTranslation();
     const [status, setStatus] = useState<AnalysisStatus>('loading');
     const [analysisResult, setAnalysisResult] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -49,11 +51,11 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
             if (result.success) {
                 await fetchAnalysis();
             } else {
-                throw new Error('ログインに失敗しました');
+                throw new Error(t('loginFailed'));
             }
         } catch (err) {
             setStatus('error');
-            setErrorMessage('ログインに失敗しました。もう一度お試しください。');
+            setErrorMessage(t('loginFailed'));
         }
     };
 
@@ -62,15 +64,15 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
         setAnalysisResult('');
         try {
             const contextText = `
-ページタイトル: ${contextData.pageTitle}
-見出し: ${contextData.heading || '(見出しなし)'}
-前の文脈:
-${contextData.before}
-選択されたテキスト:
-${selectedText}
-後の文脈:
-${contextData.after}
-            `.trim();
+            ${t('contextPageTitle')}: ${contextData.pageTitle}
+            ${t('contextHeading')}: ${contextData.heading || t('noHeading')}
+            ${t('contextBefore')}:
+            ${contextData.before}
+            ${t('selectedText')}:
+            ${selectedText}
+            ${t('contextAfter')}:
+            ${contextData.after}
+                        `.trim();
 
             const response = await chrome.runtime.sendMessage({
                 action: 'fetchDictionary',
@@ -94,7 +96,7 @@ ${contextData.after}
             // ストリームの場合は、onMessageリスナーで処理
         } catch (err) {
             setStatus('error');
-            setErrorMessage(err instanceof Error ? err.message : '予期せぬエラーが発生しました');
+            setErrorMessage(err instanceof Error ? err.message : t('unexpectedError'));
         }
     };
 
@@ -113,7 +115,7 @@ ${contextData.after}
         >
             <img 
                 src={chrome.runtime.getURL('src/content/web_neutral_sq_SI.svg')}
-                alt="Googleでログイン"
+                alt={t('googleLoginAlt')}
             />
         </button>
     );
@@ -142,7 +144,7 @@ ${contextData.after}
                             color: '#666',
                             animation: 'fadeInOut 1.5s ease-in-out infinite'
                         }}>
-                            分析中...
+                            {t('analyzing')}
                         </div>
                         <div style={{
                             position: 'absolute',
@@ -151,7 +153,7 @@ ${contextData.after}
                             color: '#666',
                             fontSize: '0.8em'
                         }}>
-                            Rocket Search AIに個人情報や機密情報を送らないでください。
+                            {t('securityWarning')}
                         </div>
                         <style>
                             {`
@@ -193,7 +195,7 @@ ${contextData.after}
                         borderRadius: '4px',
                         marginBottom: '15px'
                     }}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>エラーが発生しました</div>
+                        <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{t('errorOccurred')}</div>
                         <div>{errorMessage}</div>
                         {errorMessage.includes('ログイン') && (
                             <div style={{ marginTop: '15px', textAlign: 'center' }}>
@@ -207,7 +209,7 @@ ${contextData.after}
                 return (
                     <div style={{ textAlign: 'center', padding: '20px' }}>
                         <div style={{ marginBottom: '15px', color: '#666' }}>
-                            分析を行うにはログインが必要です
+                            {t('loginRequired2')}
                         </div>
                         {renderGoogleButton()}
                     </div>
@@ -217,7 +219,7 @@ ${contextData.after}
                 return (
                     <div style={{ textAlign: 'center', padding: '20px' }}>
                         <div style={{ marginBottom: '15px', color: '#666' }}>
-                            Googleアカウントでログインしています...
+                            {t('loggingIn')}
                         </div>
                     </div>
                 );

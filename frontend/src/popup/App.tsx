@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { IoRocketSharp } from "react-icons/io5";
 import './App.css'
+import { useTranslation } from '../utils/i18n';
 
 function App() {
+  const t = useTranslation();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -50,7 +52,7 @@ function App() {
     >
       <img 
         src={chrome.runtime.getURL('src/content/web_neutral_sq_SI.svg')}
-        alt="Googleでログイン"
+        alt={t('googleLoginAlt')}
       />
     </button>
   );
@@ -62,7 +64,7 @@ function App() {
         width: '300px',
         textAlign: 'center'
       }}>
-        読み込み中...
+        {t('loading')}
       </div>
     );
   }
@@ -80,14 +82,14 @@ function App() {
         marginBottom: '20px',
         color: '#333'
       }}>
-        Rocket Search AI
+        {t('appName')}
       </h2>
       {isLoggedIn ? (
         <div style={{
           color: '#2ecc71',
           fontSize: '0.9em'
         }}>
-          ログイン済みです。テキストを選択して分析を開始できます。
+          {t('loggedIn')}
         </div>
       ) : (
         <>
@@ -95,7 +97,7 @@ function App() {
             marginBottom: '15px',
             color: '#666'
           }}>
-            分析を開始するにはログインしてください
+            {t('loginRequired')}
           </div>
           {renderGoogleButton()}
         </>

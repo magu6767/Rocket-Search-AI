@@ -8,9 +8,10 @@ dotenv.config();
 
 const manifest = defineManifest({
   manifest_version: 3,
-  name: 'Rocket Search AI',
+  name: 'appName',
   version: '1.0.0',
-  description: 'テキストを選択すると、AIがすぐに解説してくれます。',
+  description: 'appDescription',
+  default_locale: 'en',
   icons: {
     "16": "src/assets/rocket-sharp-icon16.png",
     "32": "src/assets/rocket-sharp-icon32.png",
