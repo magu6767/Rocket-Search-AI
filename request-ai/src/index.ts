@@ -92,61 +92,61 @@ const PRIVACY_POLICY_HTML = `<!DOCTYPE html>
 <body>
     <div class="container">
         <h1>Privacy Policy for Rocket Search AI</h1>
-        <h2>Rocket Search AIのプライバシーポリシー</h2>
+        <h2>Privacy Policy for Rocket Search AI</h2>
 
-        <p>本プライバシーポリシーは、サービス開発者（以下「当開発者」）が開発したGoogle Chrome拡張機能「Rocket Search AI」（以下「本拡張機能」）の利用に際し、取得する情報の取り扱いおよび保護に関する方針を示すものです。当開発者は、Chromeウェブストアのガイドラインを遵守し、安全かつ適正な運用に努めます。</p>
+        <p>This Privacy Policy outlines the handling and protection of information collected by the service developer (hereinafter referred to as "the developer") through the Google Chrome extension "Rocket Search AI" (hereinafter referred to as "the extension"). The developer is committed to complying with Chrome Web Store guidelines and ensuring safe and appropriate operation.</p>
 
         <hr>
 
-        <h3>1. 基本方針</h3>
-        <p>当開発者は、ユーザーの個人情報保護の重要性を認識し、個人情報に関する法令および業界標準を遵守するとともに、取得した情報については厳重に管理いたします。また、取得した情報は本拡張機能の提供およびサービス向上以外の目的で利用されることはありません。</p>
+        <h3>1. Basic Policy</h3>
+        <p>The developer recognizes the importance of protecting users' personal information and complies with laws and industry standards related to personal information. All collected information is strictly managed. Information obtained will not be used for any purpose other than providing and improving the extension service.</p>
 
-        <h3>2. 適用範囲</h3>
-        <p>本プライバシーポリシーは、本拡張機能の利用により取得されるすべての情報に適用されます。</p>
+        <h3>2. Scope of Application</h3>
+        <p>This Privacy Policy applies to all information obtained through the use of this extension.</p>
 
-        <h3>3. 取得する情報と利用目的</h3>
-        <p>本拡張機能では、以下の情報を取得し、以下の目的で利用いたします。</p>
+        <h3>3. Information Collected and Purpose of Use</h3>
+        <p>The extension collects and uses the following information for the purposes described below:</p>
 
-        <h4>(1) Webページ上のテキストデータ</h4>
+        <h4>(1) Text Data from Web Pages</h4>
         <ul>
-            <li><strong>取得内容:</strong> ユーザーが閲覧中のウェブページ上のテキストデータ（ユーザーが任意に送信を行った場合に限る）。</li>
-            <li><strong>利用目的:</strong> 送信されたテキストデータは、AIによる回答の精度向上およびサービス改善のために利用されます。</li>
+            <li><strong>Content Collected:</strong> Text data from web pages that users are browsing (only when users voluntarily submit such data).</li>
+            <li><strong>Purpose of Use:</strong> The submitted text data is used to improve the accuracy of AI responses and enhance the service.</li>
         </ul>
 
-        <h4>(2) メールアドレス</h4>
+        <h4>(2) Email Address</h4>
         <ul>
-            <li><strong>取得内容:</strong> ユーザーの識別を目的としたメールアドレス。</li>
-            <li><strong>取得方法:</strong> 本拡張機能内の登録フォーム等を通じてユーザーにご入力いただき、サーバー上に保存されます。</li>
-            <li><strong>利用目的:</strong> ユーザー識別およびアカウント管理、ならびにサービス提供に必要な連絡のために利用されます。</li>
+            <li><strong>Content Collected:</strong> Email address for user identification.</li>
+            <li><strong>Collection Method:</strong> Entered by users through registration forms within the extension and stored on the server.</li>
+            <li><strong>Purpose of Use:</strong> Used for user identification, account management, and necessary communications related to service provision.</li>
         </ul>
 
-        <h4>(3) 通信の安全性</h4>
-        <p><strong>通信プロトコル:</strong> 本拡張機能による全ての情報の送受信は、HTTPSによる暗号化通信を利用して行われ、情報の漏洩防止に努めています。</p>
+        <h4>(3) Communication Security</h4>
+        <p><strong>Communication Protocol:</strong> All information sent and received by this extension uses HTTPS encrypted communication to prevent information leakage.</p>
 
-        <h4>(4) その他の安全対策</h4>
-        <p>当開発者は、サーバーおよびデータベースの管理に適切なセキュリティ技術を導入し、不正アクセス、情報漏洩、改ざん等のリスクを最小限に抑えるため、さまざまな安全管理措置を講じています。</p>
+        <h4>(4) Other Security Measures</h4>
+        <p>The developer implements appropriate security technologies for server and database management and takes various security measures to minimize risks such as unauthorized access, information leakage, and tampering.</p>
 
-        <h3>4. 情報の管理と保存期間</h3>
+        <h3>4. Information Management and Retention Period</h3>
         <ul>
-            <li><strong>管理:</strong> 取得した情報は、適切なセキュリティ対策（例：アクセス制御、サーバー監視、定期的なセキュリティアップデート）を実施した上で管理されます。</li>
-            <li><strong>保存期間:</strong> メールアドレス等の個人情報は、本拡張機能の利用継続期間中、またはユーザーからの削除依頼があるまで保持し、その後速やかに削除いたします。</li>
+            <li><strong>Management:</strong> Collected information is managed with appropriate security measures (e.g., access control, server monitoring, regular security updates).</li>
+            <li><strong>Retention Period:</strong> Personal information such as email addresses is retained during the period of continued use of the extension or until a deletion request is received from the user, after which it is promptly deleted.</li>
         </ul>
 
-        <h3>5. 第三者提供について</h3>
-        <p>当開発者は、ユーザーの同意なく、取得した個人情報を第三者に提供することは一切ありません。万が一、法令に基づく開示要求があった場合を除き、厳格に管理いたします。</p>
+        <h3>5. Third-Party Disclosure</h3>
+        <p>The developer will never provide collected personal information to third parties without user consent. Information will be strictly managed except in cases where disclosure is required by law.</p>
 
-        <h3>6. ユーザーの同意について</h3>
-        <p>本拡張機能のインストールまたは利用開始時点で、本プライバシーポリシーに同意いただいたものとみなします。ご不明点やご質問がある場合は、下記のお問い合わせ先までご連絡ください。</p>
+        <h3>6. User Consent</h3>
+        <p>By installing or starting to use this extension, you are deemed to have agreed to this Privacy Policy. If you have any questions or concerns, please contact us using the information below.</p>
 
-        <h3>7. お問い合わせ先</h3>
+        <h3>7. Contact Information</h3>
         <div class="contact">
-            <p>本プライバシーポリシーに関するお問い合わせは、以下のメールアドレスまでお願いいたします。</p>
-            <p>メールアドレス： mogeko6347@gmail.com</p>
+            <p>For inquiries regarding this Privacy Policy, please contact us at the following email address:</p>
+            <p>Email: mogeko6347@gmail.com</p>
         </div>
 
         <div class="date">
-            <p>策定日<br>2025年2月24日　策定</p>
-            <p>更新日<br>2025年2月24日　更新</p>
+            <p>Established on<br>February 24, 2025</p>
+            <p>Last Updated<br>March 30, 2025</p>
         </div>
     </div>
 </body>
