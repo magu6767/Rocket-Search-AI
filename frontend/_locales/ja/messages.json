@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "Rocket Search AI - ローカライズ版",
+    "message": "Rocket Search AI",
     "description": "拡張機能の名前"
   },
   "appDescription": {
@@ -8,7 +8,7 @@
     "description": "拡張機能の説明"
   },
   "loggedIn": {
-    "message": "ログイン済みです。テキストを選択して分析を開始できます。-testststststtststst",
+    "message": "ログイン済みです。テキストを選択して分析を開始できます。",
     "description": "ログイン済みの表示メッセージ"
   },
   "loginRequired": {

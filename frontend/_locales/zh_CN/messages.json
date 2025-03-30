@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "扩展程序的名称"
+  },
+  "appDescription": {
+    "message": "选择文本，获取AI即时解释。",
+    "description": "扩展程序的描述"
+  },
+  "loggedIn": {
+    "message": "您已登录。选择文本开始分析。",
+    "description": "登录状态消息"
+  },
+  "loginRequired": {
+    "message": "请登录以开始分析",
+    "description": "需要登录的消息"
+  },
+  "googleLoginAlt": {
+    "message": "使用Google登录",
+    "description": "Google登录按钮替代文本"
+  },
+  "loading": {
+    "message": "加载中...",
+    "description": "加载指示器"
+  },
+  "analyzing": {
+    "message": "分析中...",
+    "description": "分析进行中"
+  },
+  "securityWarning": {
+    "message": "请勿向Rocket Search AI发送个人或机密信息。",
+    "description": "安全警告"
+  },
+  "errorOccurred": {
+    "message": "发生错误",
+    "description": "错误标题"
+  },
+  "loginFailed": {
+    "message": "登录失败。请重试。",
+    "description": "登录失败消息"
+  },
+  "loginRequired2": {
+    "message": "需要登录才能执行分析",
+    "description": "对话框中的登录要求消息"
+  },
+  "loggingIn": {
+    "message": "正在使用Google账户登录...",
+    "description": "登录指示器"
+  },
+  "contextPageTitle": {
+    "message": "页面标题",
+    "description": "上下文页面标题标签"
+  },
+  "contextHeading": {
+    "message": "标题",
+    "description": "上下文标题标签"
+  },
+  "noHeading": {
+    "message": "(无标题)",
+    "description": "无标题时显示"
+  },
+  "contextBefore": {
+    "message": "前文上下文",
+    "description": "前文上下文标签"
+  },
+  "selectedText": {
+    "message": "选中的文本",
+    "description": "选中文本标签"
+  },
+  "contextAfter": {
+    "message": "后文上下文",
+    "description": "后文上下文标签"
+  },
+  "unexpectedError": {
+    "message": "发生意外错误",
+    "description": "意外错误消息"
+  },
+  "basePrompt": {
+    "message": "请分析以下选中的文本并用中文输出。「分析」指的是详细解释短词的含义，或清晰解释较长段落的内容。我已包含页面标题、标题和周围上下文以提供更好的理解。请只专注于分析选中的文本，不要在输出中包含这些上下文元素。",
+    "description": "基本提示"
+  }
+}
