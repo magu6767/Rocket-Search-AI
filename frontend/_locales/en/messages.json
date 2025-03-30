@@ -75,4 +75,9 @@
     "message": "An unexpected error occurred",
     "description": "Unexpected error message"
   }
+,
+  "basePrompt": {
+    "message": "Please analyze the following selected text. 'analyze' means thoroughly explaining the meaning of short words in detail, or clearly explaining the content of longer passages. I've included the page title, heading, and surrounding context to provide better understanding. Please focus only on analyzing the selected text without including these contextual elements in your output.",
+    "description": "Base prompt"
+  }
 } 

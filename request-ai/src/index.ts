@@ -271,12 +271,7 @@ export default {
 			const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-preview-02-05" });
 
 			// ストリームレスポンスの生成
-			const prompt = `以下の選択されたテキストを分析して日本語で出力してください。
-「分析」とは、短い単語なら単純にその意味を調べて詳しく丁寧に解説し、長めの文章ならその内容をわかりやすく解説することです。
-分脈がわかるように、ページタイトル、見出し、前後の文脈を載せます。あくまで選択したテキストを分析して欲しいので、これらの情報は出力に含めないでください。
-${text}`;
-
-			const result = await model.generateContentStream(prompt);
+			const result = await model.generateContentStream(text);
 
 			// ReadableStreamの作成
 			const encoder = new TextEncoder();

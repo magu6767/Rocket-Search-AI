@@ -8,9 +8,9 @@ dotenv.config();
 
 const manifest = defineManifest({
   manifest_version: 3,
-  name: 'appName',
+  name: '__MSG_appName__',
   version: '1.0.0',
-  description: 'appDescription',
+  description: '__MSG_appDescription__',
   default_locale: 'en',
   icons: {
     "16": "src/assets/rocket-sharp-icon16.png",

@@ -64,6 +64,7 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
         setAnalysisResult('');
         try {
             const contextText = `
+            ${t('basePrompt')}
             ${t('contextPageTitle')}: ${contextData.pageTitle}
             ${t('contextHeading')}: ${contextData.heading || t('noHeading')}
             ${t('contextBefore')}:
