@@ -1,11 +1,8 @@
-# テキスト選択時にポップアップボタンを表示する拡張機能
+# Rocket Search AI
 
 ## 概要
 
-テキスト選択時にポップアップボタンを表示する拡張機能です。
+webページ上のテキストを選択すると、すぐAIにテキストの意味を解説させることができるChrome拡張です。
 
-## 使用方法
-
-1. テキストを選択します。
-2. ポップアップボタンが表示されます。
-3. ポップアップボタンをクリックすると、選択したテキストが表示されます。
+Chromeストアページ：
+https://chromewebstore.google.com/detail/rocket-search-ai/doigkhmbgkhblbboacpglknapcfimcae
