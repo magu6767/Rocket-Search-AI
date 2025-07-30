@@ -13,10 +13,9 @@
 
 import type { FirebaseIdToken } from "firebase-auth-cloudflare-workers";
 import { Auth, WorkersKVStoreSingle } from "firebase-auth-cloudflare-workers";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Env {
-	GEMINI_API_KEY: string;
+	AI: Ai;
 	FIREBASE_PROJECT_ID: string;
 	CLOUDFLARE_PUBLIC_JWK_CACHE_KEY: string; // 好きな名前でOK、ここで設定した名前でKeyとValue（公開鍵）が登録される
 	CLOUDFLARE_PUBLIC_JWK_CACHE_KV: KVNamespace;
@@ -266,30 +265,63 @@ export default {
 				return new Response('Text is required', { status: 400 });
 			}
 
-			// Gemini APIクライアントの初期化
-			const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
-			const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
-
-			// ストリームレスポンスの生成
-			const result = await model.generateContentStream(text);
+			// Cloudflare Workers AIを使用してストリーミングレスポンスを生成
+			const aiStream = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+				messages: [{
+					role: 'user',
+					content: text
+				}],
+				stream: true
+			});
 
 			// ReadableStreamの作成
 			const encoder = new TextEncoder();
 			const stream = new ReadableStream({
 				async start(controller) {
 					try {
-						for await (const chunk of result.stream) {
-							const chunkText = chunk.text();
-							if (chunkText) {
-								// 文字単位で分割してキューに入れる
-								for (const char of chunkText) {
-									// SSE形式でデータを送信
-									const message = `data: ${JSON.stringify({ result: char })}\n\n`;
-									controller.enqueue(encoder.encode(message));
+						const reader = aiStream.getReader();
+						const decoder = new TextDecoder();
+						let buffer = '';
+
+						while (true) {
+							const { done, value } = await reader.read();
+							if (done) break;
+							
+							// バイト配列をテキストに変換
+							buffer += decoder.decode(value, { stream: true });
+							
+							// SSEの行を処理
+							const lines = buffer.split('\n');
+							buffer = lines.pop() || ''; // 最後の不完全な行をバッファに残す
+							
+							for (const line of lines) {
+								if (line.trim() && line.startsWith('data: ')) {
+									const data = line.slice(6);
+									if (data === '[DONE]') {
+										// ストリーム終了を通知
+										controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+										controller.close();
+										return;
+									}
+									
+									try {
+										const parsed = JSON.parse(data);
+										if (parsed.response) {
+											// 文字単位で分割してキューに入れる
+											for (const char of parsed.response) {
+												// SSE形式でデータを送信
+												const message = `data: ${JSON.stringify({ result: char })}\n\n`;
+												controller.enqueue(encoder.encode(message));
+											}
+										}
+									} catch (e) {
+										console.error('Failed to parse AI response:', e);
+									}
 								}
 							}
 						}
-						// ストリーム終了を通知
+						
+						// 最終的にストリーム終了を通知
 						controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 						controller.close();
 					} catch (error) {
