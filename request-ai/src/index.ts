@@ -268,7 +268,7 @@ export default {
 
 			// Gemini APIクライアントの初期化
 			const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
-			const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-preview-02-05" });
+			const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
 			// ストリームレスポンスの生成
 			const result = await model.generateContentStream(text);
