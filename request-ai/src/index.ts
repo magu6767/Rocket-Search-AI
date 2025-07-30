@@ -266,10 +266,10 @@ export default {
 			}
 
 			// Cloudflare Workers AIを使用してストリーミングレスポンスを生成
-			const aiStream = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+			const aiStream = await env.AI.run('@cf/meta/llama-4-scout-17b-16e-instruct', {
 				messages: [{
 					role: 'user',
-					content: text
+					content: "You are a helpful assistant. Please answer the following question within 100 words: " + text
 				}],
 				stream: true
 			});
