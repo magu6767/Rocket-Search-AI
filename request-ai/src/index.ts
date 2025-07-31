@@ -161,37 +161,51 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 
 	try {
 		// JWTをハッシュ化してキーとして使用
-        // これでも遅い時がある
+		const hashStartTime = Date.now();
 		const encoder = new TextEncoder();
 		const data = encoder.encode(jwt);
 		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
 		const hashArray = Array.from(new Uint8Array(hashBuffer));
 		const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+		console.log(`JWTハッシュ化: ${Date.now() - hashStartTime}ms`);
 
 		// キャッシュからuidを取得（ハッシュ化したキーを使用）
+		const cacheStartTime = Date.now();
 		const cachedUid = await env.VERIFIED_TOKEN_KV.get(hashHex);
+		console.log(`キャッシュ確認: ${Date.now() - cacheStartTime}ms`);
 		if (cachedUid) {
+			console.log('キャッシュヒット');
 			return cachedUid;
 		}
 
+		console.log('キャッシュミス - Firebase検証開始');
 		// KVの初期化
+		const kvInitStartTime = Date.now();
 		const kvStore = WorkersKVStoreSingle.getOrInitialize(
 			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KEY,
 			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KV
 		);
+		console.log(`KV初期化: ${Date.now() - kvInitStartTime}ms`);
 
+		const authInitStartTime = Date.now();
 		const auth = Auth.getOrInitialize(env.FIREBASE_PROJECT_ID, kvStore);
+		console.log(`Auth初期化: ${Date.now() - authInitStartTime}ms`);
+		
+		const verifyStartTime = Date.now();
 		const token = await auth.verifyIdToken(jwt, false);
+		console.log(`Firebaseトークン検証: ${Date.now() - verifyStartTime}ms`);
 		const uid = token.uid;
 
 		// 検証済みトークンをキャッシュに保存（ハッシュ化したキーを使用）
+		const cacheSaveStartTime = Date.now();
 		await env.VERIFIED_TOKEN_KV.put(hashHex, uid, {
 			expirationTtl: 3600 // 1時間
 		});
+		console.log(`キャッシュ保存: ${Date.now() - cacheSaveStartTime}ms`);
 
 		return uid;
 	} catch (error: any) {
-		console.error('Detailed error:', {
+		console.error('JWT検証エラー:', {
 			message: error.message,
 			stack: error.stack,
 			name: error.name
@@ -202,16 +216,21 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 
 async function checkRateLimit(uid: string, env: Env): Promise<boolean> {
 	const kvKey = `${uid}`;
+	const getRateStartTime = Date.now();
 	const currentValue = await env.RATE_LIMIT_KV.get(kvKey);
+	console.log(`レート制限取得: ${Date.now() - getRateStartTime}ms`);
 	const requestCount = currentValue ? parseInt(currentValue) : 0;
+	console.log(`現在のリクエスト数: ${requestCount}/${DAILY_LIMIT}`);
 
 	if (requestCount >= DAILY_LIMIT) {
 		return false;
 	}
 
+	const putRateStartTime = Date.now();
 	await env.RATE_LIMIT_KV.put(kvKey, (requestCount + 1).toString(), {
 		expirationTtl: TIME_WINDOW,
 	});
+	console.log(`レート制限更新: ${Date.now() - putRateStartTime}ms`);
 
 	return true;
 }
@@ -243,11 +262,18 @@ export default {
 		}
 
 		try {
+			const startTime = Date.now();
+			console.log(`リクエスト開始: ${new Date().toISOString()}`);
+			
 			// JWTの検証
+			const jwtStartTime = Date.now();
 			const uid = await verifyJWT(request, env);
+			console.log(`JWT検証完了: ${Date.now() - jwtStartTime}ms`);
 			
 			// レートリミットのチェック
+			const rateLimitStartTime = Date.now();
 			const isWithinLimit = await checkRateLimit(uid, env);
+			console.log(`レート制限チェック完了: ${Date.now() - rateLimitStartTime}ms`);
 			if (!isWithinLimit) {
 				return new Response('リクエスト制限を超えました。一日にリクエストできるのは20回までです。\n\nしばらく待ってから再度お試しください。', {
 					status: 429,
@@ -266,6 +292,8 @@ export default {
 			}
 
 			// Cloudflare Workers AIを使用してストリーミングレスポンスを生成
+			const aiStartTime = Date.now();
+			console.log(`AI実行開始: ${new Date().toISOString()}`);
 			const aiStream = await env.AI.run('@cf/meta/llama-4-scout-17b-16e-instruct', {
 				messages: [{
 					role: 'user',
@@ -273,19 +301,27 @@ export default {
 				}],
 				stream: true
 			});
+			console.log(`AI実行完了（ストリーム取得）: ${Date.now() - aiStartTime}ms`);
 
 			// ReadableStreamの作成
 			const encoder = new TextEncoder();
 			const stream = new ReadableStream({
 				async start(controller) {
 					try {
+						const streamStartTime = Date.now();
+						console.log(`ストリーミング処理開始: ${new Date().toISOString()}`);
 						const reader = aiStream.getReader();
 						const decoder = new TextDecoder();
 						let buffer = '';
 
+						let chunkCount = 0;
 						while (true) {
 							const { done, value } = await reader.read();
-							if (done) break;
+							if (done) {
+								console.log(`ストリーミング完了: 総チャンク数=${chunkCount}, 総処理時間=${Date.now() - streamStartTime}ms`);
+								break;
+							}
+							chunkCount++;
 							
 							// バイト配列をテキストに変換
 							buffer += decoder.decode(value, { stream: true });
@@ -334,6 +370,7 @@ export default {
 				}
 			});
 
+			console.log(`リクエスト処理完了（ストリーム開始まで）: ${Date.now() - startTime}ms`);
 			return new Response(stream, {
 				headers: {
 					'Content-Type': 'text/event-stream',
