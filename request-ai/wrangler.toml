@@ -28,7 +28,15 @@ id = "88e2485718f44f1e84f283189b0f2133"
 name = "RATE_LIMIT_OBJECT"
 class_name = "RateLimitObject"
 
+[[durable_objects.bindings]]
+name = "TOKEN_CACHE_OBJECT"
+class_name = "TokenCacheObject"
+
 # ここは "追記" で新しいタグにする（既存の v1 は残す）
 [[migrations]]
 tag = "v2-rate-limit"
 new_sqlite_classes = ["RateLimitObject"]
+
+[[migrations]]
+tag = "v2-token-cache"
+new_sqlite_classes = ["TokenCacheObject"]

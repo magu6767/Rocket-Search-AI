@@ -23,6 +23,7 @@ interface Env {
 	RATE_LIMIT_KV: KVNamespace;
 	VERIFIED_TOKEN_KV: KVNamespace;
 	RATE_LIMIT_OBJECT: DurableObjectNamespace<RateLimitObject>;
+	TOKEN_CACHE_OBJECT: DurableObjectNamespace<TokenCacheObject>;
 }
 
 interface RequestData {
@@ -76,6 +77,33 @@ export class RateLimitObject extends DurableObject<Env> {
 
 	async alarm(): Promise<void> {
 		console.log(`[RateLimit] アラーム実行 - 期限切れデータのクリーンアップ`);
+		await this.ctx.storage.deleteAll();
+	}
+}
+
+export class TokenCacheObject extends DurableObject<Env> {
+	constructor(ctx: DurableObjectState, env: Env) {
+		super(ctx, env);
+	}
+
+	async getToken(jwtHash: string): Promise<string | null> {
+		const start = performance.now();
+		const cachedUid = await this.ctx.storage.get<string>(jwtHash);
+		const duration = performance.now() - start;
+		console.log(`[TokenCache] トークン取得: ${duration.toFixed(2)}ms`);
+		return cachedUid ?? null;
+	}
+
+	async setToken(jwtHash: string, uid: string): Promise<void> {
+		const start = performance.now();
+		await this.ctx.storage.put(jwtHash, uid);
+		await this.ctx.storage.setAlarm(Date.now() + 3600 * 1000); // 1時間後にクリーンアップ
+		const duration = performance.now() - start;
+		console.log(`[TokenCache] トークン保存: ${duration.toFixed(2)}ms`);
+	}
+
+	async alarm(): Promise<void> {
+		console.log(`[TokenCache] アラーム実行 - 期限切れトークンのクリーンアップ`);
 		await this.ctx.storage.deleteAll();
 	}
 }
@@ -219,10 +247,13 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 		const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 		console.log(`JWTハッシュ化: ${Date.now() - hashStartTime}ms`);
 
-		// キャッシュからuidを取得（ハッシュ化したキーを使用）
+		// Durable Objectからキャッシュを取得
 		const cacheStartTime = Date.now();
-		const cachedUid = await env.VERIFIED_TOKEN_KV.get(hashHex);
-		console.log(`キャッシュ確認: ${Date.now() - cacheStartTime}ms`);
+		const tokenCacheId: DurableObjectId = env.TOKEN_CACHE_OBJECT.idFromName("token-cache");
+		const tokenCacheStub = env.TOKEN_CACHE_OBJECT.get(tokenCacheId);
+		const cachedUid = await tokenCacheStub.getToken(hashHex);
+		console.log(`[TokenCache] Durable Objectキャッシュ確認: ${Date.now() - cacheStartTime}ms`);
+		
 		if (cachedUid) {
 			console.log('キャッシュヒット');
 			return cachedUid;
@@ -246,12 +277,10 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 		console.log(`Firebaseトークン検証: ${Date.now() - verifyStartTime}ms`);
 		const uid = token.uid;
 
-		// 検証済みトークンをキャッシュに保存（ハッシュ化したキーを使用）
+		// Durable Objectにキャッシュを保存
 		const cacheSaveStartTime = Date.now();
-		await env.VERIFIED_TOKEN_KV.put(hashHex, uid, {
-			expirationTtl: 3600 // 1時間
-		});
-		console.log(`キャッシュ保存: ${Date.now() - cacheSaveStartTime}ms`);
+		await tokenCacheStub.setToken(hashHex, uid);
+		console.log(`[TokenCache] Durable Objectキャッシュ保存: ${Date.now() - cacheSaveStartTime}ms`);
 
 		return uid;
 	} catch (error: any) {
