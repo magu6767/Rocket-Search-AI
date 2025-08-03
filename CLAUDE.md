@@ -1,86 +1,114 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、Claude Code (claude.ai/code) がこのリポジトリでコードを作業する際のガイダンスを提供します。
 
-## Project Overview
+## プロジェクト概要
 
-This is a Chrome extension called "Rocket Search AI" that allows users to select text on web pages and get AI-powered explanations instantly. The project uses a monorepo structure with two main components:
+これは「Rocket Search AI」というChrome拡張機能で、ユーザーがWebページ上でテキストを選択すると、即座にAIによる解説を得ることができます。プロジェクトはモノレポ構造を採用し、2つの主要コンポーネントで構成されています：
 
-- **Frontend** (Chrome Extension): React + TypeScript application located in `/frontend`
-- **Backend** (Cloudflare Workers): API service located in `/request-ai`
+- **フロントエンド** (Chrome拡張機能): `/frontend`に配置されたReact + TypeScriptアプリケーション
+- **バックエンド** (Cloudflare Workers): `/request-ai`に配置されたAPIサービス
 
-## Architecture
+## アーキテクチャ
 
-### Frontend Chrome Extension (`/frontend`)
-- **Popup**: Extension icon click interface (`src/popup/`)
-- **Content Script**: Injected into web pages to capture selected text (`src/content/`)
-- **Background Script**: Manages communication between content script and backend (`src/background/`)
-- Uses Shadow DOM to avoid conflicts with host page styles
-- Implements Firebase authentication with Google OAuth2
-- Built with Vite + @crxjs/vite-plugin for Chrome extension development
+### フロントエンド Chrome拡張機能 (`/frontend`)
+- **Popup**: 拡張機能アイコンクリック時のインターフェース (`src/popup/`)
+- **Content Script**: Webページに注入され、選択されたテキストをキャプチャ (`src/content/`)
+- **Background Script**: Content ScriptとバックエンドAPIの通信を管理 (`src/background/`)
+- ホストページのスタイルとの競合を避けるためShadow DOMを使用
+- Google OAuth2によるFirebase認証を実装
+- Vite + @crxjs/vite-pluginでChrome拡張機能開発を行う
 
-### Backend Cloudflare Workers (`/request-ai`)
-- Handles API requests from the Chrome extension
-- Integrates with Google Gemini AI for text analysis
-- Implements Firebase JWT verification for authentication
-- Features rate limiting (20 requests per day per user)
-- Streams responses using Server-Sent Events (SSE)
+### バックエンド Cloudflare Workers (`/request-ai`)
+- Chrome拡張機能からのAPIリクエストを処理
+- テキスト解析のためGoogle Gemini AIと連携
+- 認証のためFirebase JWT検証を実装
+- レート制限機能（ユーザーあたり1日20リクエスト）
+- Server-Sent Events (SSE)を使用したレスポンスストリーミング
 
-### Communication Flow
-1. Content Script captures user-selected text
-2. Background Script receives data and forwards to Cloudflare Workers
-3. Cloudflare Workers processes request with Gemini AI
-4. Response streams back through Background Script to Content Script
+### 通信フロー
+1. Content Scriptがユーザー選択テキストをキャプチャ
+2. Background Scriptがデータを受信してCloudflare Workersに転送
+3. Cloudflare WorkersがGemini AIでリクエストを処理
+4. レスポンスがBackground Script経由でContent Scriptにストリームバック
 
-## Development Commands
+## 開発コマンド
 
-### Frontend (`/frontend`)
-- **Package Manager**: pnpm
-- **Development**: `pnpm dev` (starts Vite dev server on port 5173)
-- **Build**: `pnpm build` (TypeScript compilation + Vite build)
-- **Lint**: `pnpm lint` (ESLint)
-- **Preview**: `pnpm preview`
+### フロントエンド (`/frontend`)
+- **パッケージマネージャー**: pnpm
+- **開発**: `pnpm dev` (ポート5173でVite開発サーバーを起動)
+- **ビルド**: `pnpm build` (TypeScriptコンパイル + Viteビルド)
+- **リント**: `pnpm lint` (ESLint)
+- **プレビュー**: `pnpm preview`
 
-### Backend (`/request-ai`)
-- **Package Manager**: npm
-- **Development**: `npm run dev` or `npm start` (Wrangler dev server)
-- **Deploy**: `npm run deploy` (Deploy to Cloudflare Workers)
-- **Test**: `npm test` (Vitest)
-- **Type Generation**: `npm run cf-typegen`
+### バックエンド (`/request-ai`)
+- **パッケージマネージャー**: npm
+- **開発**: `npm run dev` または `npm start` (Wrangler開発サーバー)
+- **デプロイ**: `npm run deploy` (Cloudflare Workersにデプロイ)
+- **テスト**: `npm test` (Vitest)
+- **型生成**: `npm run cf-typegen`
 
-## Configuration Files
+## 設定ファイル
 
-### Frontend
-- `vite.config.ts`: Contains Chrome extension manifest configuration
-- `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`: TypeScript configuration
-- `eslint.config.js`: ESLint configuration
-- Requires `.env` file with Firebase and Google OAuth credentials
+### フロントエンド
+- `vite.config.ts`: Chrome拡張機能マニフェスト設定を含む
+- `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`: TypeScript設定
+- `eslint.config.js`: ESLint設定
+- FirebaseとGoogle OAuth認証情報を含む`.env`ファイルが必要
 
-### Backend
-- `wrangler.toml`: Cloudflare Workers configuration with KV namespaces
-- `vitest.config.mts`: Vitest testing configuration
-- Environment variables needed: GEMINI_API_KEY, Firebase config
+### バックエンド
+- `wrangler.toml`: KVネームスペースを含むCloudflare Workers設定
+- `vitest.config.mts`: Vitestテスト設定
+- 必要な環境変数: GEMINI_API_KEY、Firebase設定
 
-## Key Technologies
+## 主要技術
 
-### Frontend
+### フロントエンド
 - React 19 with TypeScript
-- Mantine UI components
+- Mantine UIコンポーネント
 - Firebase Authentication (web-extension)
 - Chrome Extensions API
-- Vite build system with CRXJS plugin
+- @crxjs/vite-pluginを使用したViteビルドシステム
 
-### Backend
-- Cloudflare Workers runtime
+### バックエンド
+- Cloudflare Workersランタイム
 - Google Generative AI (Gemini 2.0 Flash Lite)
-- Firebase Auth verification
-- Cloudflare KV for caching and rate limiting
-- Vitest for testing
+- Firebase認証検証
+- キャッシュとレート制限のためのCloudflare KV
+- テスト用Vitest
 
-## Development Notes
+## 開発時の注意点
 
-- The project supports internationalization with message files in `_locales/`
-- Authentication tokens are cached in Cloudflare KV for performance
-- Rate limiting is implemented per user with 24-hour windows
-- All communication uses HTTPS and proper CORS headers
-- Privacy policy is served from the Workers endpoint at `/privacy-policy`
+- `_locales/`のメッセージファイルによる国際化サポート
+- パフォーマンス向上のためCloudflare KVで認証トークンをキャッシュ
+- ユーザーごとの24時間ウィンドウでレート制限を実装（1日20リクエスト）
+- 全通信でHTTPSと適切なCORSヘッダーを使用
+- プライバシーポリシーはWorkersエンドポイント`/privacy-policy`で提供
+
+## 重要な実装詳細
+
+### Durable Objects アーキテクチャ
+- **RateLimitObject**: SQLiteストレージを使用したユーザーごとのレート制限管理
+- **TokenCacheObject**: パフォーマンス最適化のためJWTトークンキャッシュ
+- 両方ともエッジロケーション間での一貫した状態管理にDurable Objectsを使用
+
+### AIモデル設定
+- `llama-4-scout-17b-16e-instruct`モデルでCloudflare Workers AIを使用
+- Server-Sent Events (SSE)によるストリーミングレスポンス
+- 認証済みリクエストのみJWT検証
+
+### Chrome拡張機能コンポーネントの分離
+- **Content Script** (`src/content/`): Shadow DOM分離によるテキスト選択UI
+- **Background Script** (`src/background/`): API通信用サービスワーカー
+- **Popup Script** (`src/popup/`): 拡張機能アイコンインターフェース
+- 注意: Chrome拡張機能の「background scripts」はCloudflare Workersバックエンドとは異なります
+
+### 主要な環境変数
+- フロントエンド: `GOOGLE_CLIENT_ID`, `EXTENSION_PUBLIC_KEY` (Chrome Web Store用)
+- バックエンド: Firebase設定、Cloudflare Workers環境で管理されるGemini APIキー
+
+### 認証フロー
+1. Chrome拡張機能identity APIを通じたGoogle OAuth2
+2. Firebase JWTトークン生成
+3. firebase-auth-cloudflare-workersを使用したCloudflare Workersでのトークン検証
+4. パフォーマンス向上のためのキャッシュされたトークン検証
