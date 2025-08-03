@@ -11,6 +11,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { DurableObject } from "cloudflare:workers";
 import type { FirebaseIdToken } from "firebase-auth-cloudflare-workers";
 import { Auth, WorkersKVStoreSingle } from "firebase-auth-cloudflare-workers";
 
@@ -21,6 +22,7 @@ interface Env {
 	CLOUDFLARE_PUBLIC_JWK_CACHE_KV: KVNamespace;
 	RATE_LIMIT_KV: KVNamespace;
 	VERIFIED_TOKEN_KV: KVNamespace;
+	RATE_LIMIT_OBJECT: DurableObjectNamespace<RateLimitObject>;
 }
 
 interface RequestData {
@@ -29,6 +31,54 @@ interface RequestData {
 
 const DAILY_LIMIT = 20; // 1日あたりのリクエスト制限
 const TIME_WINDOW = 86400; // 24時間（秒）
+
+export class RateLimitObject extends DurableObject<Env> {
+	constructor(ctx: DurableObjectState, env: Env) {
+		super(ctx, env);
+	}
+
+	async checkAndIncrementLimit(uid: string): Promise<boolean> {
+		const methodStart = performance.now();
+		console.log(`[RateLimit] checkAndIncrementLimit(${uid})開始`);
+
+		const getStart = performance.now();
+		const currentValue = await this.ctx.storage.get<number>(uid);
+		const getDuration = performance.now() - getStart;
+		console.log(`[ストレージ] レート制限取得: ${getDuration.toFixed(2)}ms`);
+
+		const requestCount = currentValue ?? 0;
+		console.log(`現在のリクエスト数: ${requestCount}/${DAILY_LIMIT}`);
+
+		if (requestCount >= DAILY_LIMIT) {
+			const methodDuration = performance.now() - methodStart;
+			console.log(`[RateLimit] 制限超過: ${methodDuration.toFixed(2)}ms`);
+			return false;
+		}
+
+		const putStart = performance.now();
+		await this.ctx.storage.put(uid, requestCount + 1);
+		await this.ctx.storage.setAlarm(Date.now() + TIME_WINDOW * 1000);
+		const putDuration = performance.now() - putStart;
+		console.log(`[ストレージ] レート制限更新: ${putDuration.toFixed(2)}ms`);
+
+		const methodDuration = performance.now() - methodStart;
+		console.log(`[RateLimit] checkAndIncrementLimit()完了: ${methodDuration.toFixed(2)}ms`);
+		return true;
+	}
+
+	async getCurrentCount(uid: string): Promise<number> {
+		const start = performance.now();
+		const count = await this.ctx.storage.get<number>(uid);
+		const duration = performance.now() - start;
+		console.log(`[ストレージ] カウント取得: ${duration.toFixed(2)}ms`);
+		return count ?? 0;
+	}
+
+	async alarm(): Promise<void> {
+		console.log(`[RateLimit] アラーム実行 - 期限切れデータのクリーンアップ`);
+		await this.ctx.storage.deleteAll();
+	}
+}
 
 // プライバシーポリシーページのHTML
 const PRIVACY_POLICY_HTML = `<!DOCTYPE html>
@@ -215,24 +265,18 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 }
 
 async function checkRateLimit(uid: string, env: Env): Promise<boolean> {
-	const kvKey = `${uid}`;
-	const getRateStartTime = Date.now();
-	const currentValue = await env.RATE_LIMIT_KV.get(kvKey);
-	console.log(`レート制限取得: ${Date.now() - getRateStartTime}ms`);
-	const requestCount = currentValue ? parseInt(currentValue) : 0;
-	console.log(`現在のリクエスト数: ${requestCount}/${DAILY_LIMIT}`);
+	const rateLimitStartTime = Date.now();
+	console.log(`[レート制限] Durable Object使用でチェック開始`);
 
-	if (requestCount >= DAILY_LIMIT) {
-		return false;
-	}
-
-	const putRateStartTime = Date.now();
-	await env.RATE_LIMIT_KV.put(kvKey, (requestCount + 1).toString(), {
-		expirationTtl: TIME_WINDOW,
-	});
-	console.log(`レート制限更新: ${Date.now() - putRateStartTime}ms`);
-
-	return true;
+	const id: DurableObjectId = env.RATE_LIMIT_OBJECT.idFromName("rate-limit");
+	const stub = env.RATE_LIMIT_OBJECT.get(id);
+	
+	const result = await stub.checkAndIncrementLimit(uid);
+	
+	const duration = Date.now() - rateLimitStartTime;
+	console.log(`[レート制限] Durable Objectチェック完了: ${duration}ms`);
+	
+	return result;
 }
 
 export default {

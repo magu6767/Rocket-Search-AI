@@ -23,3 +23,12 @@ id = "a4891659d2924553a4ef7a966c66d92c"
 [[kv_namespaces]]
 binding = "VERIFIED_TOKEN_KV"
 id = "88e2485718f44f1e84f283189b0f2133"
+
+[[durable_objects.bindings]]
+name = "RATE_LIMIT_OBJECT"
+class_name = "RateLimitObject"
+
+# ここは "追記" で新しいタグにする（既存の v1 は残す）
+[[migrations]]
+tag = "v2-rate-limit"
+new_sqlite_classes = ["RateLimitObject"]
