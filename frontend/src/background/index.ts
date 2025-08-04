@@ -56,8 +56,15 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     const userCredential = await signInWithCredential(auth, credential);
     const idToken = await userCredential.user.getIdToken();
     const refreshToken = await userCredential.user.refreshToken;
-    await chrome.storage.local.set({ idToken });
-    await chrome.storage.local.set({ refreshToken });
+    
+    // トークンの有効期限を計算して保存（Firebase ID tokenは1時間有効）
+    const tokenExpirationTime = Date.now() + (3600 * 1000); // 1時間後
+    
+    await chrome.storage.local.set({ 
+      idToken,
+      refreshToken,
+      tokenExpirationTime
+    });
     return { success: true };
   } catch (error) {
     console.error('ログインエラー:', error);
@@ -96,11 +103,41 @@ const refreshIdToken = async (refreshToken: string) => {
 
     const data = await response.json();
 
+    // 新しいトークンの有効期限を計算して保存
+    const tokenExpirationTime = Date.now() + (3600 * 1000); // 1時間後
+    await chrome.storage.local.set({ 
+      idToken: data.id_token,
+      tokenExpirationTime
+    });
+
     return data.id_token;
   } catch (error) {
     console.error('トークンリフレッシュエラー:', error);
     throw new Error(error instanceof Error ? error.message : 'トークンのリフレッシュ中に予期せぬエラーが発生しました');
   }
+};
+
+// トークンが有効期限切れまたは10分以内に期限切れになるかチェック
+const isTokenExpiringSoon = (expirationTime: number): boolean => {
+  const tenMinutesFromNow = Date.now() + (10 * 60 * 1000); // 10分後
+  return expirationTime <= tenMinutesFromNow;
+};
+
+// プロアクティブなトークンリフレッシュ
+const ensureValidToken = async (): Promise<string> => {
+  const { idToken, refreshToken, tokenExpirationTime } = await chrome.storage.local.get(['idToken', 'refreshToken', 'tokenExpirationTime']);
+  
+  if (!idToken || !refreshToken) {
+    throw new Error('認証が必要です');
+  }
+
+  // トークンが存在しない場合や10分以内に期限切れになる場合はリフレッシュ
+  if (!tokenExpirationTime || isTokenExpiringSoon(tokenExpirationTime)) {
+    console.log('トークンが期限切れ間近のため、プロアクティブにリフレッシュします');
+    return await refreshIdToken(refreshToken);
+  }
+
+  return idToken;
 };
 
 
@@ -123,15 +160,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'fetchDictionary') {
     (async () => {
       try {
-        const { idToken } = await chrome.storage.local.get('idToken');
-        if (!idToken) {
-          console.log('idTokenが見つかりません');
-          sendResponse({
-            error: true,
-            message: '認証が必要です'
-          });
-          return;
-        }
         if (request.text.length > 10000) {
           sendResponse({
             error: true,
@@ -140,9 +168,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           return;
         }
 
-        let response = await fetchDictionary(request.text, idToken);
+        // プロアクティブなトークン管理を使用
+        const validToken = await ensureValidToken();
+        let response = await fetchDictionary(request.text, validToken);
 
-        // エラーが返ってきたら、リフレッシュトークンを使用してidTokenを更新する
+        // エラーが返ってきた場合の処理（プロアクティブリフレッシュでも失敗した場合）
         if (!response.ok) {
           const errorText = await response.text();
           console.log('APIリクエストに失敗しました', response.status, errorText);
@@ -152,11 +182,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             throw new Error(`${errorText}`);
           }
 
-          // それ以外のエラーの場合はトークンをリフレッシュして再試行
+          // それ以外のエラーの場合は強制的にトークンをリフレッシュして再試行
           const { refreshToken } = await chrome.storage.local.get('refreshToken');
           if (refreshToken) {
+            console.log('プロアクティブリフレッシュでも失敗したため、強制的にリフレッシュします');
             const refreshedIdToken = await refreshIdToken(refreshToken);
-            await chrome.storage.local.set({ idToken: refreshedIdToken });
             const retryResponse = await fetchDictionary(request.text, refreshedIdToken);
             if (!retryResponse.ok) {
               throw new Error(`APIリクエストに失敗しました: ${ await retryResponse.text()}`);
