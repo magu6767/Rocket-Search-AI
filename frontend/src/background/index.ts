@@ -57,8 +57,8 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     const idToken = await userCredential.user.getIdToken();
     const refreshToken = await userCredential.user.refreshToken;
     
-    // トークンの有効期限を計算して保存（Firebase ID tokenは1時間有効）
-    const tokenExpirationTime = Date.now() + (3600 * 1000); // 1時間後
+    // Firebase ID tokenはデフォルトで1時間有効
+    const tokenExpirationTime = Date.now() + (3600 * 1000);
     
     await chrome.storage.local.set({ 
       idToken,
@@ -74,6 +74,7 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     };
   }
 };
+
 
 const fetchDictionary = async (text: string, idToken: string) => {
   const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
@@ -103,8 +104,9 @@ const refreshIdToken = async (refreshToken: string) => {
 
     const data = await response.json();
 
-    // 新しいトークンの有効期限を計算して保存
-    const tokenExpirationTime = Date.now() + (3600 * 1000); // 1時間後
+    // expires_in フィールドから有効期限を計算
+    const expiresInMs = parseInt(data.expires_in) * 1000;
+    const tokenExpirationTime = Date.now() + expiresInMs;
     await chrome.storage.local.set({ 
       idToken: data.id_token,
       tokenExpirationTime
@@ -119,6 +121,7 @@ const refreshIdToken = async (refreshToken: string) => {
 
 // トークンが有効期限切れまたは10分以内に期限切れになるかチェック
 const isTokenExpiringSoon = (expirationTime: number): boolean => {
+  return true;
   const tenMinutesFromNow = Date.now() + (10 * 60 * 1000); // 10分後
   return expirationTime <= tenMinutesFromNow;
 };
