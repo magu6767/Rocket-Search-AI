@@ -121,7 +121,6 @@ const refreshIdToken = async (refreshToken: string) => {
 
 // トークンが有効期限切れまたは10分以内に期限切れになるかチェック
 const isTokenExpiringSoon = (expirationTime: number): boolean => {
-  return true;
   const tenMinutesFromNow = Date.now() + (10 * 60 * 1000); // 10分後
   return expirationTime <= tenMinutesFromNow;
 };
