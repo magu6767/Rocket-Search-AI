@@ -44,14 +44,8 @@ export class RateLimitObject extends DurableObject<Env> {
 	}
 
 	async checkAndIncrementLimit(uid: string): Promise<boolean> {
-		const methodStart = performance.now();
-		console.log(`[RateLimit] checkAndIncrementLimit(${uid})開始`);
-
 		const now = Date.now();
-		const getStart = performance.now();
 		const userData = await this.ctx.storage.get<UserRateLimit>(uid);
-		const getDuration = performance.now() - getStart;
-		console.log(`[ストレージ] レート制限取得: ${getDuration.toFixed(2)}ms`);
 
 		// 24時間ウィンドウの開始時刻を計算
 		const currentWindowStart = Math.floor(now / (TIME_WINDOW * 1000)) * (TIME_WINDOW * 1000);
@@ -68,14 +62,10 @@ export class RateLimitObject extends DurableObject<Env> {
 			// 異なるウィンドウの場合は新しいウィンドウでリセット
 		}
 
-		console.log(`現在のリクエスト数: ${requestCount}/${DAILY_LIMIT} (ウィンドウ: ${new Date(windowStart).toISOString()})`);
-
 		if (requestCount >= DAILY_LIMIT) {
-            await this.ctx.storage.delete(uid);
 			return false;
 		}
 
-		const putStart = performance.now();
 		const newUserData: UserRateLimit = {
 			count: requestCount + 1,
 			windowStart: windowStart
@@ -85,20 +75,11 @@ export class RateLimitObject extends DurableObject<Env> {
 		// 次のウィンドウ開始時刻にアラームを設定（古いデータのクリーンアップ用）
 		const nextWindowStart = windowStart + (TIME_WINDOW * 1000);
 		await this.ctx.storage.setAlarm(nextWindowStart + 3600 * 1000); // 1時間の猶予を持たせてクリーンアップ
-		
-		const putDuration = performance.now() - putStart;
-		console.log(`[ストレージ] レート制限更新: ${putDuration.toFixed(2)}ms`);
-
-		const methodDuration = performance.now() - methodStart;
-		console.log(`[RateLimit] checkAndIncrementLimit()完了: ${methodDuration.toFixed(2)}ms`);
 		return true;
 	}
 
 	async getCurrentCount(uid: string): Promise<number> {
-		const start = performance.now();
 		const userData = await this.ctx.storage.get<UserRateLimit>(uid);
-		const duration = performance.now() - start;
-		console.log(`[ストレージ] カウント取得: ${duration.toFixed(2)}ms`);
 		
 		if (!userData) return 0;
 		
@@ -115,7 +96,6 @@ export class RateLimitObject extends DurableObject<Env> {
 	}
 
 	async alarm(): Promise<void> {
-		console.log(`[RateLimit] アラーム実行 - 古いウィンドウデータのクリーンアップ`);
 		const now = Date.now();
 		const currentWindowStart = Math.floor(now / (TIME_WINDOW * 1000)) * (TIME_WINDOW * 1000);
 		
@@ -131,7 +111,6 @@ export class RateLimitObject extends DurableObject<Env> {
 		
 		if (keysToDelete.length > 0) {
 			await this.ctx.storage.delete(keysToDelete);
-			console.log(`[RateLimit] ${keysToDelete.length}個の古いデータを削除`);
 		}
 	}
 }
@@ -142,23 +121,16 @@ export class TokenCacheObject extends DurableObject<Env> {
 	}
 
 	async getToken(jwtHash: string): Promise<string | null> {
-		const start = performance.now();
 		const cachedUid = await this.ctx.storage.get<string>(jwtHash);
-		const duration = performance.now() - start;
-		console.log(`[TokenCache] トークン取得: ${duration.toFixed(2)}ms`);
 		return cachedUid ?? null;
 	}
 
 	async setToken(jwtHash: string, uid: string): Promise<void> {
-		const start = performance.now();
 		await this.ctx.storage.put(jwtHash, uid);
 		await this.ctx.storage.setAlarm(Date.now() + 3600 * 1000); // 1時間後にクリーンアップ
-		const duration = performance.now() - start;
-		console.log(`[TokenCache] トークン保存: ${duration.toFixed(2)}ms`);
 	}
 
 	async alarm(): Promise<void> {
-		console.log(`[TokenCache] アラーム実行 - 期限切れトークンのクリーンアップ`);
 		await this.ctx.storage.deleteAll();
 	}
 }
@@ -294,48 +266,34 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 
 	try {
 		// JWTをハッシュ化してキーとして使用
-		const hashStartTime = Date.now();
 		const encoder = new TextEncoder();
 		const data = encoder.encode(jwt);
 		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
 		const hashArray = Array.from(new Uint8Array(hashBuffer));
 		const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-		console.log(`JWTハッシュ化: ${Date.now() - hashStartTime}ms`);
 
 		// Durable Objectからキャッシュを取得
-		const cacheStartTime = Date.now();
 		const tokenCacheId: DurableObjectId = env.TOKEN_CACHE_OBJECT.idFromName("token-cache");
 		const tokenCacheStub = env.TOKEN_CACHE_OBJECT.get(tokenCacheId);
 		const cachedUid = await tokenCacheStub.getToken(hashHex);
-		console.log(`[TokenCache] Durable Objectキャッシュ確認: ${Date.now() - cacheStartTime}ms`);
 		
 		if (cachedUid) {
-			console.log('キャッシュヒット');
 			return cachedUid;
 		}
 
-		console.log('キャッシュミス - Firebase検証開始');
 		// KVの初期化
-		const kvInitStartTime = Date.now();
 		const kvStore = WorkersKVStoreSingle.getOrInitialize(
 			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KEY,
 			env.CLOUDFLARE_PUBLIC_JWK_CACHE_KV
 		);
-		console.log(`KV初期化: ${Date.now() - kvInitStartTime}ms`);
 
-		const authInitStartTime = Date.now();
 		const auth = Auth.getOrInitialize(env.FIREBASE_PROJECT_ID, kvStore);
-		console.log(`Auth初期化: ${Date.now() - authInitStartTime}ms`);
 		
-		const verifyStartTime = Date.now();
 		const token = await auth.verifyIdToken(jwt, false);
-		console.log(`Firebaseトークン検証: ${Date.now() - verifyStartTime}ms`);
 		const uid = token.uid;
 
 		// Durable Objectにキャッシュを保存
-		const cacheSaveStartTime = Date.now();
 		await tokenCacheStub.setToken(hashHex, uid);
-		console.log(`[TokenCache] Durable Objectキャッシュ保存: ${Date.now() - cacheSaveStartTime}ms`);
 
 		return uid;
 	} catch (error: any) {
@@ -349,16 +307,10 @@ const verifyJWT = async (req: Request, env: Env): Promise<string> => {
 }
 
 async function checkRateLimit(uid: string, env: Env): Promise<boolean> {
-	const rateLimitStartTime = Date.now();
-	console.log(`[レート制限] Durable Object使用でチェック開始`);
-
 	const id: DurableObjectId = env.RATE_LIMIT_OBJECT.idFromName("rate-limit");
 	const stub = env.RATE_LIMIT_OBJECT.get(id);
 	
 	const result = await stub.checkAndIncrementLimit(uid);
-	
-	const duration = Date.now() - rateLimitStartTime;
-	console.log(`[レート制限] Durable Objectチェック完了: ${duration}ms`);
 	
 	return result;
 }
@@ -390,18 +342,11 @@ export default {
 		}
 
 		try {
-			const startTime = Date.now();
-			console.log(`リクエスト開始: ${new Date().toISOString()}`);
-			
 			// JWTの検証
-			const jwtStartTime = Date.now();
 			const uid = await verifyJWT(request, env);
-			console.log(`JWT検証完了: ${Date.now() - jwtStartTime}ms`);
 			
 			// レートリミットのチェック
-			const rateLimitStartTime = Date.now();
 			const isWithinLimit = await checkRateLimit(uid, env);
-			console.log(`レート制限チェック完了: ${Date.now() - rateLimitStartTime}ms`);
 			if (!isWithinLimit) {
 				return new Response('リクエスト制限を超えました。一日にリクエストできるのは20回までです。\n\nしばらく待ってから再度お試しください。', {
 					status: 429,
@@ -420,8 +365,6 @@ export default {
 			}
 
 			// Cloudflare Workers AIを使用してストリーミングレスポンスを生成
-			const aiStartTime = Date.now();
-			console.log(`AI実行開始: ${new Date().toISOString()}`);
 			const aiStream = await env.AI.run('@cf/meta/llama-4-scout-17b-16e-instruct', {
 				messages: [{
 					role: 'user',
@@ -429,27 +372,20 @@ export default {
 				}],
 				stream: true
 			});
-			console.log(`AI実行完了（ストリーム取得）: ${Date.now() - aiStartTime}ms`);
 
 			// ReadableStreamの作成
 			const encoder = new TextEncoder();
 			const stream = new ReadableStream({
 				async start(controller) {
 					try {
-						const streamStartTime = Date.now();
-						console.log(`ストリーミング処理開始: ${new Date().toISOString()}`);
 						const reader = aiStream.getReader();
 						const decoder = new TextDecoder();
 						let buffer = '';
-
-						let chunkCount = 0;
 						while (true) {
 							const { done, value } = await reader.read();
 							if (done) {
-								console.log(`ストリーミング完了: 総チャンク数=${chunkCount}, 総処理時間=${Date.now() - streamStartTime}ms`);
 								break;
 							}
-							chunkCount++;
 							
 							// バイト配列をテキストに変換
 							buffer += decoder.decode(value, { stream: true });
@@ -498,7 +434,6 @@ export default {
 				}
 			});
 
-			console.log(`リクエスト処理完了（ストリーム開始まで）: ${Date.now() - startTime}ms`);
 			return new Response(stream, {
 				headers: {
 					'Content-Type': 'text/event-stream',
