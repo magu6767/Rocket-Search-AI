@@ -42,14 +42,14 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
 
     // URLからアクセストークンを取得
     const searchParams = new URL(responseUrl.replace(/#/, '?')).searchParams;
-    const token = searchParams.get('access_token');
-    if (!token) {
+    const accessToken = searchParams.get('access_token');
+    if (!accessToken) {
       return { success: false, error: 'アクセストークンの取得に失敗しました' };
     }
 
     const auth = getAuth();
     // Google の OAuth トークン（アクセストークン）を Firebase が理解できる credential に変換する
-    const credential = GoogleAuthProvider.credential(null, token);
+    const credential = GoogleAuthProvider.credential(null, accessToken);
 
     // 生成した credential を Firebase サーバーに送信し、トークンの正当性を検証する
     // 検証成功後、idTokenを取得し、Firebase はユーザーアカウントを作成または取得し、認証状態を確立する
