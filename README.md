@@ -15,7 +15,7 @@ Rocket Search AIは、Webページ上のテキストを選択するだけで、�
 
 ### 主な特徴
 - **シンプルな操作**: テキスト選択 → 即座に解説表示
-- **高精度AI**: Google Gemini AIによる文脈を考慮した適切な解説
+- **高精度AI**: Cloudflare Workers AIによる文脈を考慮した適切な解説
 - **セキュアな認証**: Google OAuth2 + Firebase認証
 - **使用制限**: 1日20リクエストまで（無料プラン）
 
@@ -54,7 +54,7 @@ graph TB
     end
     
     subgraph "External Services"
-        GA[Google Gemini AI<br/>Text Analysis]
+        GA[Cloudflare Workers AI<br/>Text Analysis]
         FB[Firebase Auth<br/>JWT Verification]
     end
     
@@ -84,7 +84,7 @@ graph TB
 
 #### バックエンド (Cloudflare Workers)
 - **Runtime**: Cloudflare Workers (Edge Computing)
-- **AI Model**: Google Gemini 2.0 Flash Lite
+- **AI Model**: Cloudflare Workers AI (@cf/meta/llama-4-scout-17b-16e-instruct)
 - **認証**: firebase-auth-cloudflare-workers
 - **ストレージ**: 
   - Durable Objects (レート制限、トークンキャッシュ)
@@ -167,9 +167,12 @@ VITE_GOOGLE_CLIENT_ID=your-google-client-id
 VITE_EXTENSION_PUBLIC_KEY=your-extension-public-key
 ```
 
-#### Backend (wrangler.toml + secrets)
-```bash
-wrangler secret put GEMINI_API_KEY
+#### Backend (wrangler.toml)
+```toml
+# AIバインディング設定
+[ai]
+binding = "AI"
+
 # Firebase設定はwrangler.tomlに記載
 ```
 
