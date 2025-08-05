@@ -120,7 +120,6 @@ rocket-search-ai/
 │
 ├── doc/                     # ドキュメント
 │   └── authentication-system.md
-├── CLAUDE.md               # Claude Code向け開発ガイド
 └── README.md               # プロジェクトドキュメント
 ```
 
