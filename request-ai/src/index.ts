@@ -7,8 +7,6 @@ interface Env {
 	FIREBASE_PROJECT_ID: string;
 	CLOUDFLARE_PUBLIC_JWK_CACHE_KEY: string; // 好きな名前でOK、ここで設定した名前でKeyとValue（公開鍵）が登録される
 	CLOUDFLARE_PUBLIC_JWK_CACHE_KV: KVNamespace;
-	RATE_LIMIT_KV: KVNamespace;
-	VERIFIED_TOKEN_KV: KVNamespace;
 	RATE_LIMIT_OBJECT: DurableObjectNamespace<RateLimitObject>;
 	TOKEN_CACHE_OBJECT: DurableObjectNamespace<TokenCacheObject>;
 }
