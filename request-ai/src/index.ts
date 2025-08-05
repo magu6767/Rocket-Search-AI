@@ -33,6 +33,11 @@ interface RequestData {
 const DAILY_LIMIT = 20; // 1日あたりのリクエスト制限
 const TIME_WINDOW = 86400; // 24時間（秒）
 
+interface UserRateLimit {
+	count: number;
+	windowStart: number; // ウィンドウ開始時刻（Unix timestamp）
+}
+
 export class RateLimitObject extends DurableObject<Env> {
 	constructor(ctx: DurableObjectState, env: Env) {
 		super(ctx, env);
@@ -42,23 +47,45 @@ export class RateLimitObject extends DurableObject<Env> {
 		const methodStart = performance.now();
 		console.log(`[RateLimit] checkAndIncrementLimit(${uid})開始`);
 
+		const now = Date.now();
 		const getStart = performance.now();
-		const currentValue = await this.ctx.storage.get<number>(uid);
+		const userData = await this.ctx.storage.get<UserRateLimit>(uid);
 		const getDuration = performance.now() - getStart;
 		console.log(`[ストレージ] レート制限取得: ${getDuration.toFixed(2)}ms`);
 
-		const requestCount = currentValue ?? 0;
-		console.log(`現在のリクエスト数: ${requestCount}/${DAILY_LIMIT}`);
+		// 24時間ウィンドウの開始時刻を計算
+		const currentWindowStart = Math.floor(now / (TIME_WINDOW * 1000)) * (TIME_WINDOW * 1000);
+		
+		let requestCount = 0;
+		let windowStart = currentWindowStart;
+
+		if (userData) {
+			// 既存データがあり、同じウィンドウ内の場合はカウントを継続
+			if (userData.windowStart === currentWindowStart) {
+				requestCount = userData.count;
+				windowStart = userData.windowStart;
+			}
+			// 異なるウィンドウの場合は新しいウィンドウでリセット
+		}
+
+		console.log(`現在のリクエスト数: ${requestCount}/${DAILY_LIMIT} (ウィンドウ: ${new Date(windowStart).toISOString()})`);
 
 		if (requestCount >= DAILY_LIMIT) {
-			const methodDuration = performance.now() - methodStart;
-			console.log(`[RateLimit] 制限超過: ${methodDuration.toFixed(2)}ms`);
+            await this.ctx.storage.delete(uid);
 			return false;
 		}
 
 		const putStart = performance.now();
-		await this.ctx.storage.put(uid, requestCount + 1);
-		await this.ctx.storage.setAlarm(Date.now() + TIME_WINDOW * 1000);
+		const newUserData: UserRateLimit = {
+			count: requestCount + 1,
+			windowStart: windowStart
+		};
+		await this.ctx.storage.put(uid, newUserData);
+		
+		// 次のウィンドウ開始時刻にアラームを設定（古いデータのクリーンアップ用）
+		const nextWindowStart = windowStart + (TIME_WINDOW * 1000);
+		await this.ctx.storage.setAlarm(nextWindowStart + 3600 * 1000); // 1時間の猶予を持たせてクリーンアップ
+		
 		const putDuration = performance.now() - putStart;
 		console.log(`[ストレージ] レート制限更新: ${putDuration.toFixed(2)}ms`);
 
@@ -69,15 +96,43 @@ export class RateLimitObject extends DurableObject<Env> {
 
 	async getCurrentCount(uid: string): Promise<number> {
 		const start = performance.now();
-		const count = await this.ctx.storage.get<number>(uid);
+		const userData = await this.ctx.storage.get<UserRateLimit>(uid);
 		const duration = performance.now() - start;
 		console.log(`[ストレージ] カウント取得: ${duration.toFixed(2)}ms`);
-		return count ?? 0;
+		
+		if (!userData) return 0;
+		
+		// 現在のウィンドウを確認
+		const now = Date.now();
+		const currentWindowStart = Math.floor(now / (TIME_WINDOW * 1000)) * (TIME_WINDOW * 1000);
+		
+		// 古いウィンドウのデータの場合は0を返す
+		if (userData.windowStart !== currentWindowStart) {
+			return 0;
+		}
+		
+		return userData.count;
 	}
 
 	async alarm(): Promise<void> {
-		console.log(`[RateLimit] アラーム実行 - 期限切れデータのクリーンアップ`);
-		await this.ctx.storage.deleteAll();
+		console.log(`[RateLimit] アラーム実行 - 古いウィンドウデータのクリーンアップ`);
+		const now = Date.now();
+		const currentWindowStart = Math.floor(now / (TIME_WINDOW * 1000)) * (TIME_WINDOW * 1000);
+		
+		// 現在のウィンドウより古いデータを削除
+		const allData = await this.ctx.storage.list<UserRateLimit>();
+		const keysToDelete: string[] = [];
+		
+		for (const [key, userData] of allData) {
+			if (userData.windowStart < currentWindowStart - (TIME_WINDOW * 1000)) {
+				keysToDelete.push(key);
+			}
+		}
+		
+		if (keysToDelete.length > 0) {
+			await this.ctx.storage.delete(keysToDelete);
+			console.log(`[RateLimit] ${keysToDelete.length}個の古いデータを削除`);
+		}
 	}
 }
 
