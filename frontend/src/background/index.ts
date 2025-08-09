@@ -28,7 +28,7 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     }
 
     // 認証URLを生成
-    const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(chrome.identity.getRedirectURL())}&response_type=token&scope=${encodeURIComponent(scopes.join(' '))}`;
+    const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(chrome.identity.getRedirectURL())}&response_type=id_token&scope=${encodeURIComponent(scopes.join(' '))}`;
 
     // Google側での認証（ユーザーがGoogleアカウントを使用して認証を行う）
     const responseUrl = await chrome.identity.launchWebAuthFlow({
@@ -39,29 +39,30 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
     if (!responseUrl) {
       return { success: false, error: 'ログインがキャンセルされました' };
     }
+    console.log('responseUrl', responseUrl);
 
-    // URLからアクセストークンを取得
+    // URLからIDトークンを取得
     const searchParams = new URL(responseUrl.replace(/#/, '?')).searchParams;
-    const accessToken = searchParams.get('access_token');
-    if (!accessToken) {
-      return { success: false, error: 'アクセストークンの取得に失敗しました' };
+    const idToken = searchParams.get('id_token');
+    if (!idToken) {
+      return { success: false, error: 'IDトークンの取得に失敗しました' };
     }
 
     const auth = getAuth();
-    // Google の OAuth トークン（アクセストークン）を Firebase が理解できる credential に変換する
-    const credential = GoogleAuthProvider.credential(null, accessToken);
+    // Google の IDトークンを Firebase が理解できる credential に変換する
+    const credential = GoogleAuthProvider.credential(idToken);
 
     // 生成した credential を Firebase サーバーに送信し、トークンの正当性を検証する
-    // 検証成功後、idTokenを取得し、Firebase はユーザーアカウントを作成または取得し、認証状態を確立する
+    // 検証成功後、Firebase はユーザーアカウントを作成または取得し、認証状態を確立する
     const userCredential = await signInWithCredential(auth, credential);
-    const idToken = await userCredential.user.getIdToken();
+    const firebaseIdToken = await userCredential.user.getIdToken();
     const refreshToken = await userCredential.user.refreshToken;
     
     // Firebase ID tokenはデフォルトで1時間有効
     const tokenExpirationTime = Date.now() + (3600 * 1000);
     
     await chrome.storage.local.set({ 
-      idToken,
+      firebaseIdToken,
       refreshToken,
       tokenExpirationTime
     });
@@ -76,11 +77,11 @@ const signIn = async (): Promise<{ success: boolean; error?: string }> => {
 };
 
 
-const fetchDictionary = async (text: string, idToken: string) => {
+const fetchDictionary = async (text: string, firebaseIdToken: string) => {
   const response = await fetch('https://request-ai.mogeko6347.workers.dev', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${idToken}`,
+      'Authorization': `Bearer ${firebaseIdToken}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ text: text })
@@ -108,7 +109,7 @@ const refreshIdToken = async (refreshToken: string) => {
     const expiresInMs = parseInt(data.expires_in) * 1000;
     const tokenExpirationTime = Date.now() + expiresInMs;
     await chrome.storage.local.set({ 
-      idToken: data.id_token,
+      firebaseIdToken: data.id_token,
       tokenExpirationTime
     });
 
@@ -127,9 +128,9 @@ const isTokenExpiringSoon = (expirationTime: number): boolean => {
 
 // プロアクティブなトークンリフレッシュ
 const ensureValidToken = async (): Promise<string> => {
-  const { idToken, refreshToken, tokenExpirationTime } = await chrome.storage.local.get(['idToken', 'refreshToken', 'tokenExpirationTime']);
+  const { firebaseIdToken, refreshToken, tokenExpirationTime } = await chrome.storage.local.get(['firebaseIdToken', 'refreshToken', 'tokenExpirationTime']);
   
-  if (!idToken || !refreshToken) {
+  if (!firebaseIdToken || !refreshToken) {
     throw new Error('認証が必要です');
   }
 
@@ -139,7 +140,7 @@ const ensureValidToken = async (): Promise<string> => {
     return await refreshIdToken(refreshToken);
   }
 
-  return idToken;
+  return firebaseIdToken;
 };
 
 
