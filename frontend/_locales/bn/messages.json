@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "টেক্সট নির্বাচন করুন এবং তাৎক্ষণিক AI ব্যাখ্যা পান।",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "আপনি লগ ইন করেছেন। বিশ্লেষণ শুরু করতে টেক্সট নির্বাচন করুন।",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "বিশ্লেষণ শুরু করতে দয়া করে লগ ইন করুন",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Google দিয়ে সাইন ইন করুন",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "লোড হচ্ছে...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "বিশ্লেষণ করা হচ্ছে...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "Rocket Search AI-এ ব্যক্তিগত বা গোপনীয় তথ্য পাঠাবেন না।",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "একটি ত্রুটি ঘটেছে",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "বিশ্লেষণ করার জন্য লগইন প্রয়োজন",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Google অ্যাকাউন্ট দিয়ে লগ ইন করা হচ্ছে...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "পৃষ্ঠার শিরোনাম",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "শিরোনাম",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(কোন শিরোনাম নেই)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "পূর্ববর্তী প্রসঙ্গ",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "নির্বাচিত টেক্সট",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "পরবর্তী প্রসঙ্গ",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "একটি অপ্রত্যাশিত ত্রুটি ঘটেছে",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "দয়া করে নিম্নলিখিত নির্বাচিত টেক্সট বিশ্লেষণ করুন এবং বাংলায় উত্তর দিন। 'বিশ্লেষণ' মানে ছোট শব্দের অর্থ বিস্তারিতভাবে ব্যাখ্যা করা, অথবা দীর্ঘ অনুচ্ছেদের বিষয়বস্তু স্পষ্টভাবে ব্যাখ্যা করা। আমি ভালো বোঝার জন্য পৃষ্ঠার শিরোনাম, শিরোনাম এবং আশেপাশের প্রসঙ্গ অন্তর্ভুক্ত করেছি। দয়া করে আপনার উত্তরে এই প্রাসঙ্গিক উপাদানগুলি অন্তর্ভুক্ত না করে শুধুমাত্র নির্বাচিত টেক্সট বিশ্লেষণে মনোনিবেশ করুন।",
+    "description": "Base prompt"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "Выделите текст и получите мгновенное объяснение от ИИ.",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "Вы вошли в систему. Выделите текст для начала анализа.",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "Пожалуйста, войдите в систему для начала анализа",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Войти через Google",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "Загрузка...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "Анализ...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "Не отправляйте личную или конфиденциальную информацию в Rocket Search AI.",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "Произошла ошибка",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "Ошибка входа. Пожалуйста, попробуйте снова.",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "Для выполнения анализа требуется вход в систему",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Вход через аккаунт Google...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "Заголовок страницы",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "Заголовок",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(Без заголовка)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "Контекст до",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "Выделенный текст",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "Контекст после",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "Произошла непредвиденная ошибка",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "Пожалуйста, проанализируйте следующий выделенный текст и ответьте на русском языке. 'Анализ' означает подробное объяснение значения коротких слов или ясное объяснение содержания более длинных отрывков. Я включил заголовок страницы, заголовок и окружающий контекст для лучшего понимания. Пожалуйста, сосредоточьтесь только на анализе выделенного текста, не включая эти контекстные элементы в свой ответ.",
+    "description": "Base prompt"
+  }
+}

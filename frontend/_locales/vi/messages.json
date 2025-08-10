@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "Chọn văn bản và nhận giải thích AI tức thì.",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "Bạn đã đăng nhập. Chọn văn bản để bắt đầu phân tích.",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "Vui lòng đăng nhập để bắt đầu phân tích",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Đăng nhập bằng Google",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "Đang tải...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "Đang phân tích...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "Không gửi thông tin cá nhân hoặc bí mật đến Rocket Search AI.",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "Đã xảy ra lỗi",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "Đăng nhập thất bại. Vui lòng thử lại.",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "Cần đăng nhập để thực hiện phân tích",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Đang đăng nhập bằng tài khoản Google...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "Tiêu đề trang",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "Tiêu đề",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(Không có tiêu đề)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "Ngữ cảnh trước",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "Văn bản đã chọn",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "Ngữ cảnh sau",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "Đã xảy ra lỗi không mong đợi",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "Vui lòng phân tích văn bản được chọn sau đây và trả lời bằng tiếng Việt. 'Phân tích' có nghĩa là giải thích chi tiết ý nghĩa của các từ ngắn, hoặc giải thích rõ ràng nội dung của các đoạn văn dài hơn. Tôi đã bao gồm tiêu đề trang, tiêu đề và ngữ cảnh xung quanh để hiểu rõ hơn. Vui lòng chỉ tập trung vào phân tích văn bản đã chọn mà không bao gồm các yếu tố ngữ cảnh này trong câu trả lời của bạn.",
+    "description": "Base prompt"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "เลือกข้อความและรับคำอธิบายจาก AI ทันที",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "คุณเข้าสู่ระบบแล้ว เลือกข้อความเพื่อเริ่มการวิเคราะห์",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "กรุณาเข้าสู่ระบบเพื่อเริ่มการวิเคราะห์",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "เข้าสู่ระบบด้วย Google",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "กำลังโหลด...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "กำลังวิเคราะห์...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "อย่าส่งข้อมูลส่วนบุคคลหรือข้อมูลลับไปยัง Rocket Search AI",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "เกิดข้อผิดพลาด",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "การเข้าสู่ระบบล้มเหลว กรุณาลองอีกครั้ง",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "ต้องเข้าสู่ระบบเพื่อทำการวิเคราะห์",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "กำลังเข้าสู่ระบบด้วยบัญชี Google...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "ชื่อหน้า",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "หัวข้อ",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(ไม่มีหัวข้อ)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "บริบทก่อนหน้า",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "ข้อความที่เลือก",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "บริบทถัดไป",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "เกิดข้อผิดพลาดที่ไม่คาดคิด",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "กรุณาวิเคราะห์ข้อความที่เลือกต่อไปนี้และตอบเป็นภาษาไทย 'การวิเคราะห์' หมายถึงการอธิบายความหมายของคำสั้นๆ อย่างละเอียด หรืออธิบายเนื้อหาของข้อความที่ยาวขึ้นอย่างชัดเจน ฉันได้รวมชื่อหน้า หัวข้อ และบริบทโดยรอบเพื่อความเข้าใจที่ดีขึ้น กรุณาเน้นเฉพาะการวิเคราะห์ข้อความที่เลือกโดยไม่รวมองค์ประกอบบริบทเหล่านี้ในคำตอบของคุณ",
+    "description": "Base prompt"
+  }
+}

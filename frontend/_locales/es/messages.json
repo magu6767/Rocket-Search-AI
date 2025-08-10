@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "Selecciona texto y obtén una explicación instantánea con IA.",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "Has iniciado sesión. Selecciona texto para comenzar el análisis.",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "Por favor, inicia sesión para comenzar el análisis",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Iniciar sesión con Google",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "Cargando...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "Analizando...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "No envíes información personal o confidencial a Rocket Search AI.",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "Se produjo un error",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "Error al iniciar sesión. Por favor, inténtalo de nuevo.",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "Es necesario iniciar sesión para realizar el análisis",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Iniciando sesión con cuenta de Google...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "Título de la página",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "Encabezado",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(Sin encabezado)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "Contexto anterior",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "Texto seleccionado",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "Contexto posterior",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "Se produjo un error inesperado",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "Por favor, analiza el siguiente texto seleccionado y responde en español. 'Análisis' significa explicar detalladamente el significado de palabras cortas, o explicar claramente el contenido de pasajes más largos. He incluido el título de la página, el encabezado y el contexto circundante para proporcionar una mejor comprensión. Por favor, concéntrate solo en analizar el texto seleccionado sin incluir estos elementos contextuales en tu respuesta.",
+    "description": "Base prompt"
+  }
+}

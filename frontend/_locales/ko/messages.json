@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "텍스트를 선택하고 즉시 AI 설명을 받으세요.",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "로그인되었습니다. 분석을 시작하려면 텍스트를 선택하세요.",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "분석을 시작하려면 로그인해 주세요",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Google로 로그인",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "로딩 중...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "분석 중...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "Rocket Search AI에 개인정보나 기밀 정보를 보내지 마세요.",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "오류가 발생했습니다",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "로그인 실패. 다시 시도해 주세요.",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "분석을 수행하려면 로그인이 필요합니다",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Google 계정으로 로그인 중...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "페이지 제목",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "제목",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(제목 없음)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "이전 문맥",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "선택된 텍스트",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "이후 문맥",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "예기치 않은 오류가 발생했습니다",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "다음 선택된 텍스트를 분석하고 한국어로 답변해 주세요. '분석'은 짧은 단어의 의미를 자세히 설명하거나 긴 구절의 내용을 명확하게 설명하는 것을 의미합니다. 더 나은 이해를 위해 페이지 제목, 제목 및 주변 문맥을 포함했습니다. 답변에서 이러한 문맥 요소를 포함하지 말고 선택된 텍스트 분석에만 집중해 주세요.",
+    "description": "Base prompt"
+  }
+}

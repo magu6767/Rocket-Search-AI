@@ -1,0 +1,82 @@
+{
+  "appName": {
+    "message": "Rocket Search AI",
+    "description": "Name of the extension"
+  },
+  "appDescription": {
+    "message": "टेक्स्ट चुनें और तुरंत AI से स्पष्टीकरण प्राप्त करें।",
+    "description": "Description of the extension"
+  },
+  "loggedIn": {
+    "message": "आप लॉग इन हैं। विश्लेषण शुरू करने के लिए टेक्स्ट चुनें।",
+    "description": "Logged in status message"
+  },
+  "loginRequired": {
+    "message": "कृपया विश्लेषण शुरू करने के लिए लॉग इन करें",
+    "description": "Login required message"
+  },
+  "googleLoginAlt": {
+    "message": "Google से साइन इन करें",
+    "description": "Google login button alt text"
+  },
+  "loading": {
+    "message": "लोड हो रहा है...",
+    "description": "Loading indicator"
+  },
+  "analyzing": {
+    "message": "विश्लेषण कर रहे हैं...",
+    "description": "Analysis in progress"
+  },
+  "securityWarning": {
+    "message": "Rocket Search AI को व्यक्तिगत या गोपनीय जानकारी न भेजें।",
+    "description": "Security warning"
+  },
+  "errorOccurred": {
+    "message": "एक त्रुटि हुई",
+    "description": "Error title"
+  },
+  "loginFailed": {
+    "message": "लॉगिन विफल। कृपया पुनः प्रयास करें।",
+    "description": "Login failure message"
+  },
+  "loginRequired2": {
+    "message": "विश्लेषण करने के लिए लॉगिन आवश्यक है",
+    "description": "Login required message in dialog"
+  },
+  "loggingIn": {
+    "message": "Google खाते से लॉग इन हो रहा है...",
+    "description": "Logging in indicator"
+  },
+  "contextPageTitle": {
+    "message": "पेज शीर्षक",
+    "description": "Context page title label"
+  },
+  "contextHeading": {
+    "message": "शीर्षक",
+    "description": "Context heading label"
+  },
+  "noHeading": {
+    "message": "(कोई शीर्षक नहीं)",
+    "description": "Displayed when no heading"
+  },
+  "contextBefore": {
+    "message": "पहले का संदर्भ",
+    "description": "Context before label"
+  },
+  "selectedText": {
+    "message": "चयनित टेक्स्ट",
+    "description": "Selected text label"
+  },
+  "contextAfter": {
+    "message": "बाद का संदर्भ",
+    "description": "Context after label"
+  },
+  "unexpectedError": {
+    "message": "एक अप्रत्याशित त्रुटि हुई",
+    "description": "Unexpected error message"
+  },
+  "basePrompt": {
+    "message": "कृपया निम्नलिखित चयनित टेक्स्ट का विश्लेषण करें और हिंदी में उत्तर दें। 'विश्लेषण' का अर्थ है छोटे शब्दों के अर्थ को विस्तार से समझाना, या लंबे अनुच्छेदों की सामग्री को स्पष्ट रूप से समझाना। मैंने बेहतर समझ प्रदान करने के लिए पेज शीर्षक, शीर्षक और आसपास के संदर्भ को शामिल किया है। कृपया अपने उत्तर में इन संदर्भ तत्वों को शामिल किए बिना केवल चयनित टेक्स्ट का विश्लेषण करने पर ध्यान दें।",
+    "description": "Base prompt"
+  }
+}
