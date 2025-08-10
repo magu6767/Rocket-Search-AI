@@ -78,5 +78,9 @@
   "basePrompt": {
     "message": "Vui lòng phân tích văn bản được chọn sau đây và trả lời bằng tiếng Việt. 'Phân tích' có nghĩa là giải thích chi tiết ý nghĩa của các từ ngắn, hoặc giải thích rõ ràng nội dung của các đoạn văn dài hơn. Tôi đã bao gồm tiêu đề trang, tiêu đề và ngữ cảnh xung quanh để hiểu rõ hơn. Vui lòng chỉ tập trung vào phân tích văn bản đã chọn mà không bao gồm các yếu tố ngữ cảnh này trong câu trả lời của bạn.",
     "description": "Base prompt"
+  },
+  "rateLimitError": {
+    "message": "Đã vượt quá giới hạn yêu cầu. Bạn có thể thực hiện tối đa 20 yêu cầu mỗi ngày. Vui lòng đợi và thử lại sau.",
+    "description": "Thông báo lỗi giới hạn tốc độ"
   }
 }

@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithCredential, GoogleAuthProvider } from "firebase/auth/web-extension";
+import { getMessage } from "../utils/i18n";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -180,9 +181,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           const errorText = await response.text();
           console.log('APIリクエストに失敗しました', response.status, errorText);
 
-          // 429エラーの場合はそのままエラーをスロー
+          // 429エラーの場合はローカライズされたメッセージを使用
           if (response.status === 429) {
-            throw new Error(`${errorText}`);
+            const localizedMessage = getMessage('rateLimitError');
+            throw new Error(localizedMessage || errorText);
           }
 
           // それ以外のエラーの場合は強制的にトークンをリフレッシュして再試行

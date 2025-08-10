@@ -78,5 +78,9 @@
   "basePrompt": {
     "message": "Veuillez analyser le texte sélectionné suivant et répondre en français. 'Analyse' signifie expliquer en détail la signification de mots courts, ou expliquer clairement le contenu de passages plus longs. J'ai inclus le titre de la page, l'en-tête et le contexte environnant pour une meilleure compréhension. Veuillez vous concentrer uniquement sur l'analyse du texte sélectionné sans inclure ces éléments contextuels dans votre réponse.",
     "description": "Base prompt"
+  },
+  "rateLimitError": {
+    "message": "Limite de requêtes dépassée. Vous pouvez effectuer jusqu'à 20 requêtes par jour. Veuillez attendre et réessayer plus tard.",
+    "description": "Message d'erreur de limite de débit"
   }
 }

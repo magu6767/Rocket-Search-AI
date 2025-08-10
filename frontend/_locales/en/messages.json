@@ -79,5 +79,9 @@
   "basePrompt": {
     "message": "Please analyze the following selected text and output in English. 'Analysis' means thoroughly explaining the meaning of short words in detail, or clearly explaining the content of longer passages. I've included the page title, heading, and surrounding context to provide better understanding. Please focus only on analyzing the selected text without including these contextual elements in your output.",
     "description": "Base prompt"
+  },
+  "rateLimitError": {
+    "message": "Request limit exceeded. You can make up to 20 requests per day. Please wait and try again later.",
+    "description": "Rate limit error message"
   }
 } 

@@ -78,5 +78,9 @@
   "basePrompt": {
     "message": "Por favor, analiza el siguiente texto seleccionado y responde en español. 'Análisis' significa explicar detalladamente el significado de palabras cortas, o explicar claramente el contenido de pasajes más largos. He incluido el título de la página, el encabezado y el contexto circundante para proporcionar una mejor comprensión. Por favor, concéntrate solo en analizar el texto seleccionado sin incluir estos elementos contextuales en tu respuesta.",
     "description": "Base prompt"
+  },
+  "rateLimitError": {
+    "message": "Límite de solicitudes excedido. Puedes hacer hasta 20 solicitudes por día. Por favor, espera e inténtalo más tarde.",
+    "description": "Mensaje de error de límite de velocidad"
   }
 }

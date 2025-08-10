@@ -78,5 +78,9 @@
   "basePrompt": {
     "message": "Bitte analysieren Sie den folgenden ausgewählten Text und antworten Sie auf Deutsch. 'Analyse' bedeutet, die Bedeutung kurzer Wörter ausführlich zu erklären oder den Inhalt längerer Passagen klar zu erläutern. Ich habe den Seitentitel, die Überschrift und den umgebenden Kontext eingefügt, um ein besseres Verständnis zu ermöglichen. Bitte konzentrieren Sie sich nur auf die Analyse des ausgewählten Textes, ohne diese Kontextelemente in Ihre Antwort aufzunehmen.",
     "description": "Base prompt"
+  },
+  "rateLimitError": {
+    "message": "Anfragelimit überschritten. Sie können bis zu 20 Anfragen pro Tag stellen. Bitte warten Sie und versuchen Sie es später erneut.",
+    "description": "Fehlermeldung für Ratenlimit"
   }
 }
