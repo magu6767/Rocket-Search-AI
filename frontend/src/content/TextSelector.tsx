@@ -125,6 +125,7 @@ export default function TextSelector() {
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                         }}
                         onClick={() => setIsShowDialog(true)}
+                        // アイコンボタンをマウスオーバーした時のエフェクト
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'scale(1.05)';
                             e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
