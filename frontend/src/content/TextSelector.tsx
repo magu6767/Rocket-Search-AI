@@ -82,7 +82,29 @@ export default function TextSelector() {
         };
     };
 
-    const handleTextSelection = () => {
+    const handleTextSelection = (event: MouseEvent) => {
+        // Shadow DOM内（拡張機能で表示されたダイアログ）のテキスト選択は無視する
+        const target = event.target as Node;
+        console.log(target)
+        // Shadow Rootを辿ってチェック
+        let currentNode: Node | null = target;
+        while (currentNode) {
+            if (currentNode.nodeName === 'TEXT-EXTENSION-ROOT' || 
+                (currentNode instanceof Element && currentNode.id === 'text-extension-wrapper')) {
+                return; // 拡張機能の要素内でのイベントは無視
+            }
+            // Shadow DOMの境界を越えて親を探す
+            if (currentNode.parentNode) {
+                currentNode = currentNode.parentNode;
+                console.log("aaaa")
+            } else if ((currentNode as any).host) {
+                // Shadow Rootの場合はhostを取得
+                currentNode = (currentNode as any).host;
+            } else {
+                break;
+            }
+        }
+        
         const selection = window.getSelection();
         if (selection && selection.toString().trim() !== '') {
             const range = selection.getRangeAt(0);
