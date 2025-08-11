@@ -122,7 +122,7 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
         switch (status) {
             case 'loading':
                 return (
-                    <div style={{ textAlign: 'center', padding: '20px', color: '#333' }}>
+                    <div style={{ textAlign: 'center', padding: '20px', color: '#333', fontSize: '14px' }}>
                         <div style={{ position: 'relative', width: '40px', height: '40px', margin: '0 auto' }}>
                             <div style={{
                                 position: 'absolute',
@@ -140,6 +140,7 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
                         <div style={{ 
                             marginTop: '10px', 
                             color: '#666',
+                            fontSize: '14px',
                             animation: 'fadeInOut 1.5s ease-in-out infinite'
                         }}>
                             {t('analyzing')}
@@ -149,7 +150,7 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
                             bottom: '10px',
                             left: '20px',
                             color: '#666',
-                            fontSize: '0.8em'
+                            fontSize: '11px'
                         }}>
                             {t('securityWarning')}
                         </div>
@@ -176,8 +177,8 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
                         backgroundColor: '#f8f9fa',
                         padding: '15px',
                         borderRadius: '4px',
-                        fontSize: '0.95em',
-                        lineHeight: '1.5',
+                        fontSize: '13px',
+                        lineHeight: '1.6',
                         color: '#333',
                     }}>
                         <ReactMarkdown>{analysisResult}</ReactMarkdown>
@@ -191,7 +192,8 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
                         backgroundColor: '#fff3f3',
                         color: '#d63031',
                         borderRadius: '4px',
-                        marginBottom: '15px'
+                        marginBottom: '15px',
+                        fontSize: '14px'
                     }}>
                         <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{t('errorOccurred')}</div>
                         <div>{errorMessage}</div>
@@ -205,8 +207,8 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
 
             case 'needLogin':
                 return (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <div style={{ marginBottom: '15px', color: '#666' }}>
+                    <div style={{ textAlign: 'center', padding: '20px', fontSize: '14px' }}>
+                        <div style={{ marginBottom: '15px', color: '#666', fontSize: '14px' }}>
                             {t('loginRequired2')}
                         </div>
                         {renderGoogleButton()}
@@ -215,8 +217,8 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
 
             case 'loggingIn':
                 return (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <div style={{ marginBottom: '15px', color: '#666' }}>
+                    <div style={{ textAlign: 'center', padding: '20px', fontSize: '14px' }}>
+                        <div style={{ marginBottom: '15px', color: '#666', fontSize: '14px' }}>
                             {t('loggingIn')}
                         </div>
                     </div>
@@ -236,6 +238,8 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
                     color: '#333',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                     fontFamily: 'Arial, sans-serif',
+                    fontSize: '14px',
+                    lineHeight: '1.6',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
