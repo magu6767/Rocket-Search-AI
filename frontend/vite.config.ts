@@ -9,7 +9,7 @@ dotenv.config();
 const manifest = defineManifest({
   manifest_version: 3,
   name: '__MSG_appName__',
-  version: '1.0.3',
+  version: '1.0.4',
   description: '__MSG_appDescription__',
   default_locale: 'en',
   icons: {
