@@ -67,13 +67,10 @@ export default function Dialog({selectedText, contextData}: DialogProps) {
             ${t('basePrompt')}
             ${t('contextPageTitle')}: ${contextData.pageTitle}
             ${t('contextHeading')}: ${contextData.heading || t('noHeading')}
-            ${t('contextBefore')}:
-            ${contextData.before}
-            ${t('selectedText')}:
-            ${selectedText}
-            ${t('contextAfter')}:
-            ${contextData.after}
-                        `.trim();
+            ${t('contextBefore')}: ${contextData.before}
+            ${t('selectedText')}: ${selectedText}
+            ${t('contextAfter')}: ${contextData.after}
+            `.trim();
 
             const response = await chrome.runtime.sendMessage({
                 action: 'fetchDictionary',
